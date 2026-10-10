@@ -37,3 +37,4 @@ lerna-debug.log*
 # OS metadata & temporary files
 .DS_Store
 Thumbs.db
+*.zip

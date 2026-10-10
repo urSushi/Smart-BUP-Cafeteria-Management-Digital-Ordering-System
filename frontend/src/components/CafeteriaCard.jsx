@@ -91,26 +91,36 @@ export default function CafeteriaCard({ cafeteria }) {
           )}
 
           <div className="cafeteria-card-footer">
-            <span className="crowd-status">
-              Status: <strong style={{ color: isOpen ? "var(--teal-dark)" : "var(--brick)" }}>
-                {isOpen ? `${crowdLevel} Rush` : "Reopens Later"}
-              </strong>
-            </span>
-            <div style={{ display: "flex", gap: 6 }}>
+            <div className="cafeteria-footer-meta">
+              <span className="crowd-status">
+                Status:{" "}
+                <strong style={{ color: isOpen ? "var(--teal-dark)" : "var(--brick)" }}>
+                  {isOpen ? `${crowdLevel} Rush` : "Reopens Later"}
+                </strong>
+              </span>
+              {isOpen && (
+                <span className="cafeteria-footer-wait">
+                  <Icon name="clock" size={12} color="var(--teal)" />
+                  <span>~{queueMinutes}m queue</span>
+                </span>
+              )}
+            </div>
+
+            <div className="cafeteria-card-actions">
               <button
                 type="button"
-                className="btn btn-secondary btn-sm"
+                className="btn btn-secondary btn-sm cafeteria-btn-info"
                 onClick={(e) => {
                   e.stopPropagation();
                   setModalOpen(true);
                 }}
               >
-                Quick Info
+                <span>Quick Info</span>
               </button>
 
               <button
                 type="button"
-                className="btn btn-primary btn-sm"
+                className="btn btn-primary btn-sm cafeteria-btn-menu"
                 onClick={(e) => {
                   e.stopPropagation();
                   handleNavigateToMenu();

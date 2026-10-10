@@ -1520,10 +1520,11 @@ select.input option[value=""] {
 .queue-moderate { color: #fde047; }
 
 .cafeteria-body {
-  padding: 22px;
+  padding: 18px 18px 16px;
   display: flex;
   flex-direction: column;
   flex: 1;
+  box-sizing: border-box;
 }
 .cafeteria-location {
   display: flex;
@@ -1555,14 +1556,76 @@ select.input option[value=""] {
 .cafeteria-card-footer {
   margin-top: auto;
   border-top: 1px solid var(--sand-line);
-  padding-top: 14px;
+  padding-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  box-sizing: border-box;
+}
+.cafeteria-footer-meta {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  width: 100%;
+  font-size: 0.8rem;
+  line-height: 1.3;
 }
 .crowd-status {
   font-size: 0.8rem;
   color: var(--ink-soft);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.cafeteria-footer-wait {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--teal-dark);
+  background: var(--teal-tint);
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(20, 184, 166, 0.25);
+}
+.cafeteria-card-actions {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+  width: 100%;
+  box-sizing: border-box;
+}
+.cafeteria-btn-info {
+  flex: 1;
+  min-width: 0;
+  padding: 8px 10px;
+  font-size: 0.82rem;
+  font-weight: 650;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  box-sizing: border-box;
+  border-radius: 999px;
+}
+.cafeteria-btn-menu {
+  flex: 1.25;
+  min-width: 0;
+  padding: 8px 12px;
+  font-size: 0.82rem;
+  font-weight: 750;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  white-space: nowrap;
+  box-sizing: border-box;
+  border-radius: 999px;
+}
+.cafeteria-btn-menu span {
+  white-space: nowrap;
 }
 
 /* ==========================================================================
@@ -4238,9 +4301,9 @@ select.input option[value=""] {
 .cafeteria-card-footer {
   margin-top: auto;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
 }
 
 /* 6. Cafeteria Menu & Catalog Alignments */
@@ -5855,6 +5918,37 @@ select.input option[value=""] {
   background: rgba(20, 184, 166, 0.2);
   border-color: #2dd4bf;
   color: #2dd4bf;
+}
+
+/* Cafeteria Card Footer & Actions in Dark Mode */
+[data-theme="dark"] .cafeteria-card-footer {
+  border-top-color: rgba(255, 255, 255, 0.08);
+}
+[data-theme="dark"] .cafeteria-footer-wait {
+  background: rgba(20, 184, 166, 0.15);
+  color: #5eead4;
+  border-color: rgba(20, 184, 166, 0.35);
+}
+[data-theme="dark"] .cafeteria-btn-info {
+  background: rgba(22, 32, 50, 0.85);
+  border: 1.5px solid rgba(255, 255, 255, 0.14);
+  color: #e2e8f0;
+}
+[data-theme="dark"] .cafeteria-btn-info:hover:not(:disabled) {
+  background: rgba(20, 184, 166, 0.2);
+  border-color: #2dd4bf;
+  color: #5eead4;
+}
+[data-theme="dark"] .cafeteria-btn-menu {
+  background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%);
+  border-color: rgba(45, 212, 191, 0.4);
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4), 0 0 12px rgba(13, 148, 136, 0.25);
+}
+[data-theme="dark"] .cafeteria-btn-menu:hover:not(:disabled) {
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+  border-color: #2dd4bf;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5), 0 0 16px rgba(45, 212, 191, 0.35);
 }
 
 /* 7. Cafeteria Detail & Menu Modals in Dark Mode */

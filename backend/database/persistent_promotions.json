@@ -1,0 +1,35 @@
+[
+  {
+    "code": "BUP20",
+    "description": "20% off on all campus cafeteria orders",
+    "type": "percent",
+    "value": 20,
+    "minOrder": 100,
+    "maxDiscount": 60,
+    "active": true,
+    "cafeteriaId": null,
+    "expiresAt": "2026-12-31T23:59:59Z"
+  },
+  {
+    "code": "WELCOME50",
+    "description": "৳50 Flat discount for new semester",
+    "type": "flat",
+    "value": 50,
+    "minOrder": 150,
+    "maxDiscount": 50,
+    "active": true,
+    "cafeteriaId": null,
+    "expiresAt": "2026-12-31T23:59:59Z"
+  },
+  {
+    "code": "VISTA10",
+    "description": "10% off exclusive at Vista Cafe",
+    "type": "percent",
+    "value": 10,
+    "minOrder": 80,
+    "maxDiscount": 40,
+    "active": true,
+    "cafeteriaId": "vista",
+    "expiresAt": "2026-12-31T23:59:59Z"
+  }
+]

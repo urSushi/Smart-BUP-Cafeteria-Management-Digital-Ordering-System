@@ -12,7 +12,7 @@ import { validatePromotion } from "../models/Promotion.js";
 
 export function placeOrder(req, res) {
   try {
-    const { cafeteriaId, items, paymentMethod, promoCode, userFullName, userIdentifier, mobileNumber } = req.body;
+    const { cafeteriaId, items, paymentMethod, promoCode, userFullName, userIdentifier, mobileNumber, transactionId } = req.body;
 
     if (!cafeteriaId || !items || !Array.isArray(items) || items.length === 0) {
       return res.status(400).json({ message: "Cafeteria and at least one item are required." });
@@ -40,6 +40,7 @@ export function placeOrder(req, res) {
       promoCode: discount > 0 ? promoCode : null,
       total,
       paymentMethod: paymentMethod || "bkash",
+      transactionId: transactionId || null,
       mobileNumber: mobileNumber || req.user?.phone || "01711223344",
       userFullName: userFullName || req.user?.fullName || "BUP Student",
       userIdentifier: userIdentifier || req.user?.identifier || "2021-1-60-001",

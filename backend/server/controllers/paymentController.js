@@ -4,7 +4,8 @@
 export function initiatePayment(req, res) {
   const { method, amount, orderId, mobileNumber } = req.body;
 
-  if (!["bkash", "nagad", "cash"].includes(method)) {
+  const validMethods = ["bkash", "nagad", "cash", "qr", "bangla_qr", "bkash_qr", "nagad_qr"];
+  if (!validMethods.includes(method)) {
     return res.status(400).json({ message: "Unsupported payment method." });
   }
 
@@ -31,7 +32,7 @@ export function initiatePayment(req, res) {
 }
 
 export function confirmPayment(req, res) {
-  const { method, mobileNumber, otp, pin, amount } = req.body;
+  const { method, mobileNumber, otp, pin, amount, qrPayload } = req.body;
 
   if (method === "cash") {
     return res.json({
@@ -39,6 +40,22 @@ export function confirmPayment(req, res) {
       method: "cash",
       transactionId: null,
       message: "Cash payment confirmed at pickup counter.",
+    });
+  }
+
+  // Instant QR code payment verification
+  if (["qr", "bangla_qr", "bkash_qr", "nagad_qr"].includes(method)) {
+    const prefix = method.includes("bkash") ? "TRX-BKQR" : method.includes("nagad") ? "TRX-NGQR" : "TRX-QR";
+    const transactionId = `${prefix}-${Math.floor(100000 + Math.random() * 900000)}`;
+
+    return res.json({
+      status: "SUCCESS",
+      method,
+      transactionId,
+      amount,
+      paidAt: new Date().toISOString(),
+      qrPayload: qrPayload || `SBCMS-QR-PAID-${transactionId}`,
+      message: `QR Payment of ৳${amount} confirmed successfully!`,
     });
   }
 

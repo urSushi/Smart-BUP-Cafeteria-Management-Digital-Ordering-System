@@ -2976,14 +2976,19 @@ select.input option[value=""] {
 }
 .payment-method-tabs {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 10px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
   margin: 18px 0;
+}
+@media (max-width: 520px) {
+  .payment-method-tabs {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 .pay-tab {
   background: var(--paper);
   border: 2px solid var(--sand-line);
-  padding: 10px 8px;
+  padding: 10px 6px;
   border-radius: var(--radius-md);
   cursor: pointer;
   font-weight: 700;
@@ -2992,6 +2997,7 @@ select.input option[value=""] {
   flex-direction: column;
   align-items: center;
   gap: 6px;
+  text-align: center;
   transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1),
               background 0.2s ease,
               border-color 0.2s ease,
@@ -3022,6 +3028,16 @@ select.input option[value=""] {
   border-color: #f7941d;
   background: #fff7ed;
   box-shadow: 0 4px 14px rgba(247, 148, 29, 0.18);
+}
+.pay-tab.qr-active {
+  border-color: #0d9488;
+  background: #f0fdfa;
+  box-shadow: 0 4px 14px rgba(13, 148, 136, 0.2);
+}
+.pay-tab.cash-active {
+  border-color: var(--teal);
+  background: #f0fdf4;
+  box-shadow: 0 4px 14px rgba(15, 118, 110, 0.18);
 }
 .pay-tab-logo {
   font-size: 1rem;
@@ -3154,6 +3170,169 @@ select.input option[value=""] {
   color: var(--ink-soft);
   margin-top: 14px;
   text-align: left;
+}
+
+/* QR Code Payment & Interoperable Bangla QR */
+.qr-payment-wrapper {
+  background: var(--paper-raised, #ffffff);
+  border: 1px solid var(--sand-line);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  margin-bottom: 18px;
+}
+.qr-submode-tabs {
+  display: flex;
+  background: var(--sand);
+  padding: 4px;
+  border-radius: var(--radius-md);
+  gap: 6px;
+  margin-bottom: 14px;
+}
+.qr-submode-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 10px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  border: none;
+  color: var(--ink-soft);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.qr-submode-btn.active {
+  background: #ffffff;
+  color: var(--teal-dark);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+.qr-display-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.qr-box-center {
+  margin: 4px 0 12px;
+}
+.qr-merchant-info-card {
+  width: 100%;
+  background: var(--sand);
+  border: 1px solid var(--sand-line);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  margin-bottom: 12px;
+}
+.qr-info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 0;
+  font-size: 0.82rem;
+}
+.qr-info-row:not(:last-child) {
+  border-bottom: 1px dashed var(--sand-line);
+}
+.qr-info-label {
+  color: var(--ink-soft);
+}
+.qr-info-value {
+  color: var(--ink);
+}
+.qr-info-code {
+  background: rgba(0, 0, 0, 0.06);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.78rem;
+  font-family: var(--font-mono);
+}
+.qr-interop-strip {
+  width: 100%;
+  text-align: center;
+  margin-top: 4px;
+}
+.qr-interop-title {
+  font-size: 0.74rem;
+  color: var(--ink-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 700;
+  display: block;
+  margin-bottom: 6px;
+}
+.qr-interop-tags {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.qr-tag {
+  font-size: 0.72rem;
+  font-weight: 750;
+  padding: 3px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+.bkash-tag { color: #e1136e; background: #fff1f6; border-color: rgba(225, 19, 110, 0.2); }
+.nagad-tag { color: #ea580c; background: #fff7ed; border-color: rgba(234, 88, 12, 0.2); }
+.upay-tag { color: #0284c7; background: #f0f9ff; border-color: rgba(2, 132, 199, 0.2); }
+.cellfin-tag { color: #059669; background: #ecfdf5; border-color: rgba(5, 150, 105, 0.2); }
+.bank-tag { color: var(--ink-soft); background: var(--sand); }
+.qr-scanner-panel {
+  padding-bottom: 6px;
+}
+.btn-qr-action {
+  background: var(--teal);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 4px 14px rgba(13, 148, 136, 0.3);
+}
+.btn-qr-action:hover:not(:disabled) {
+  background: var(--teal-dark);
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px rgba(13, 148, 136, 0.42);
+}
+.mfs-mode-toggle-bar {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.mfs-pill-btn {
+  background: var(--sand);
+  border: 1px solid var(--sand-line);
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: var(--ink-soft);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.2s ease;
+}
+.mfs-pill-btn:hover {
+  border-color: var(--teal);
+  color: var(--teal);
+}
+.mfs-pill-btn.active {
+  background: #ffffff;
+  border-color: var(--teal);
+  color: var(--teal);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+}
+.tag-btn.active-tag {
+  background: var(--teal-tint);
+  border-color: var(--teal);
+  color: var(--teal-dark);
+  font-weight: 800;
 }
 
 /* Order Confirmation & QR Hero */
@@ -5498,6 +5677,68 @@ select.input option[value=""] {
   color: #5eead4;
   box-shadow: 0 4px 16px rgba(45, 212, 191, 0.25);
   transform: translateY(-1px);
+}
+[data-theme="dark"] .pay-tab.qr-active {
+  border-color: #2dd4bf;
+  background: rgba(20, 184, 166, 0.18);
+  color: #5eead4;
+  box-shadow: 0 4px 16px rgba(45, 212, 191, 0.28);
+  transform: translateY(-1px);
+}
+[data-theme="dark"] .qr-payment-wrapper {
+  background: #162032;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+[data-theme="dark"] .qr-submode-tabs {
+  background: #0f172a;
+}
+[data-theme="dark"] .qr-submode-btn {
+  color: #94a3b8;
+}
+[data-theme="dark"] .qr-submode-btn.active {
+  background: #1e293b;
+  color: #5eead4;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+[data-theme="dark"] .qr-merchant-info-card {
+  background: #0f172a;
+  border-color: rgba(255, 255, 255, 0.08);
+}
+[data-theme="dark"] .qr-info-row:not(:last-child) {
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+[data-theme="dark"] .qr-info-label {
+  color: #94a3b8;
+}
+[data-theme="dark"] .qr-info-value {
+  color: #f8fafc;
+}
+[data-theme="dark"] .qr-info-code {
+  background: rgba(255, 255, 255, 0.08);
+  color: #5eead4;
+}
+[data-theme="dark"] .qr-interop-title {
+  color: #94a3b8;
+}
+[data-theme="dark"] .bkash-tag { color: #fda4af; background: rgba(225, 19, 110, 0.15); border-color: rgba(225, 19, 110, 0.35); }
+[data-theme="dark"] .nagad-tag { color: #fdba74; background: rgba(234, 88, 12, 0.15); border-color: rgba(234, 88, 12, 0.35); }
+[data-theme="dark"] .upay-tag { color: #7dd3fc; background: rgba(2, 132, 199, 0.15); border-color: rgba(2, 132, 199, 0.35); }
+[data-theme="dark"] .cellfin-tag { color: #6ee7b7; background: rgba(5, 150, 105, 0.15); border-color: rgba(5, 150, 105, 0.35); }
+[data-theme="dark"] .bank-tag { color: #cbd5e1; background: #0f172a; border-color: rgba(255, 255, 255, 0.1); }
+[data-theme="dark"] .mfs-pill-btn {
+  background: #0f172a;
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #94a3b8;
+}
+[data-theme="dark"] .mfs-pill-btn.active {
+  background: #1e293b;
+  border-color: #2dd4bf;
+  color: #5eead4;
+}
+[data-theme="dark"] .tag-btn.active-tag {
+  background: rgba(20, 184, 166, 0.25);
+  border-color: #2dd4bf;
+  color: #5eead4;
 }
 [data-theme="dark"] .mfs-sandbox-box {
   background: #162032;

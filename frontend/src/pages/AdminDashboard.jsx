@@ -19,10 +19,6 @@ export default function AdminDashboard() {
   const { user, logout } = useAuth();
   const toast = useToast();
 
-  const isCanteenAdmin = Boolean(user?.cafeteriaId && user.cafeteriaId !== "all");
-  const assignedCafeteriaId = user?.cafeteriaId;
-  const canteenInfo = assignedCafeteriaId ? CANTEEN_MAP[assignedCafeteriaId] : null;
-
   const [adminAnalytics, setAdminAnalytics] = useState(null);
   const [promotions, setPromotions] = useState([]);
   const [userList, setUserList] = useState([]);
@@ -45,24 +41,21 @@ export default function AdminDashboard() {
   const loadData = useCallback(async () => {
     try {
       const [analyticsData, promoList, allUsers, refundsList] = await Promise.all([
-        apiService.getAdminAnalytics(assignedCafeteriaId),
+        apiService.getAdminAnalytics("all"),
         apiService.listPromotions(),
         apiService.getAllUsers(),
-        apiService.getPendingRefunds(assignedCafeteriaId),
+        apiService.getPendingRefunds("all"),
       ]);
       setAdminAnalytics(analyticsData);
       setPromotions(promoList || []);
       setUserList(allUsers || []);
-      const filteredRefunds = isCanteenAdmin
-        ? (refundsList || []).filter((r) => r.cafeteriaId === assignedCafeteriaId)
-        : (refundsList || []);
-      setPendingRefunds(filteredRefunds);
+      setPendingRefunds(refundsList || []);
     } catch (err) {
       console.warn("Admin fetch:", err);
     } finally {
       setLoading(false);
     }
-  }, [assignedCafeteriaId, isCanteenAdmin]);
+  }, []);
 
   useEffect(() => {
     loadData();
@@ -178,24 +171,10 @@ export default function AdminDashboard() {
               </span>
             </div>
           </Link>
-          {isCanteenAdmin ? (
-            <div
-              className="admin-badge admin-badge-canteen"
-              style={{
-                background: "var(--teal-tint)",
-                color: "var(--teal-dark)",
-                border: "1px solid var(--teal)",
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 6,
-              }}
-            >
-              <span style={{ fontSize: "0.85rem" }}>🔒</span>
-              <span>CANTEEN ADMIN · {canteenInfo?.name?.toUpperCase() || assignedCafeteriaId?.toUpperCase()}</span>
-            </div>
-          ) : (
-            <div className="admin-badge">MASTER SYSTEM ADMINISTRATOR (ALL CANTEENS)</div>
-          )}
+          <div className="admin-badge">
+            <Icon name="shield" size={13} style={{ marginRight: 6 }} />
+            <span>UNIVERSITY ADMINISTRATOR · CENTRAL CAMPUS</span>
+          </div>
         </div>
 
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
@@ -223,7 +202,7 @@ export default function AdminDashboard() {
               onClick={() => setActiveTab("overview")}
             >
               <Icon name="zap" size={15} />
-              <span>{isCanteenAdmin ? `${canteenInfo?.name || "Canteen"} Overview` : "Cross-Cafeteria Comparison"}</span>
+              <span>Cross-Cafeteria Governance & Comparison</span>
             </button>
 
             <button

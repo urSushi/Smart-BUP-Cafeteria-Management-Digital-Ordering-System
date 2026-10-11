@@ -58,44 +58,42 @@ export default function AdminLogin() {
           Oversee campus user permissions, cafeteria vendor contracts, system logs, and security policies.
         </p>
 
-        {/* Separated Canteen Admin Demo Pills */}
+        {/* Single Main University Administrator (1-Click Fill) */}
         <div className="portal-canteen-demo-card portal-canteen-demo-admin">
           <div className="canteen-demo-header">
-            <Icon name="shield" size={14} color="var(--teal)" />
-            <span>Select Administrator Scope (1-Click Fill):</span>
+            <Icon name="shield" size={15} color="var(--teal)" />
+            <span>University Administrator (1-Click Fill):</span>
           </div>
-          <div className="canteen-demo-grid canteen-demo-grid-admin">
-            {Object.entries(adminDemos).map(([key, item]) => {
-              const isSelected = adminId === item.id;
-              return (
-                <button
-                  key={key}
-                  type="button"
-                  className={`canteen-demo-btn ${key === "all" ? "canteen-demo-btn-master" : ""} ${isSelected ? "active" : ""}`}
-                  onClick={() => handleAdminSelect(key, item)}
-                >
-                  <div className="canteen-demo-btn-top">
-                    <strong>{item.name}</strong>
-                    <span className="canteen-badge-id">{item.id}</span>
-                  </div>
-                  <div className="canteen-demo-btn-sub">
-                    <span>{item.scope}</span> · <span className="loc-text">{item.location}</span>
-                  </div>
-                </button>
-              );
-            })}
-          </div>
+          <button
+            type="button"
+            className={`canteen-demo-btn canteen-demo-btn-master ${adminId === "ADM-001" ? "active" : ""}`}
+            onClick={() => {
+              setAdminId("ADM-001");
+              setPassword("password123");
+              setError("");
+              toast.info("Filled credentials for University Administrator (ADM-001).");
+            }}
+            style={{ width: "100%", padding: "12px 14px", marginTop: 4, textAlign: "left" }}
+          >
+            <div className="canteen-demo-btn-top">
+              <strong style={{ fontSize: "0.95rem" }}>University Administrator</strong>
+              <span className="canteen-badge-id">ADM-001</span>
+            </div>
+            <div className="canteen-demo-btn-sub" style={{ marginTop: 4 }}>
+              <span>Central Campus Dining Governance</span> · <span className="loc-text">All 4 Cafeterias</span>
+            </div>
+          </button>
           <div className="canteen-demo-note">
-            🛡️ Canteen admins manage only their assigned facility; Master Admin oversees all 4 canteens.
+            🏛️ Official University Administrator account with central governance over campus dining policies, accounts, cross-cafeteria reports, and security.
           </div>
         </div>
 
         <form onSubmit={handleSubmit} style={{ textAlign: "left", marginTop: 16 }}>
           <div className="field">
-            <label>Master Admin ID</label>
+            <label>University Administrator ID</label>
             <input
               className="input"
-              placeholder="e.g. ADM-001"
+              placeholder="e.g. ADM-001 or admin@bup.edu.bd"
               value={adminId}
               onChange={(e) => setAdminId(e.target.value)}
               required
@@ -137,7 +135,7 @@ export default function AdminLogin() {
             disabled={!isValid || loading}
             style={{ marginTop: 8 }}
           >
-            {loading ? <Spinner /> : "Authorize Admin Access"}
+            {loading ? <Spinner /> : "Authorize Administrator Access"}
           </button>
         </form>
 

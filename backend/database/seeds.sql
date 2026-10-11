@@ -11,8 +11,7 @@
 -- 1. SYSTEM_ADMIN Entity
 -- ----------------------------------------------------------------------------
 INSERT INTO system_admins (admin_id, name, email, password_hash) VALUES
-('ADM-001', 'System Administrator', 'admin@bup.edu.bd', '$2a$10$7rXmB8V9bE9tS3.8R9K3QeqM2Z0o1h8E5w6s9n1v3y8p0q2r4t6u8'),
-('ADM-THP', 'Third Place Canteen Administrator', 'admin.monpura@bup.edu.bd', '$2a$10$7rXmB8V9bE9tS3.8R9K3QeqM2Z0o1h8E5w6s9n1v3y8p0q2r4t6u8')
+('ADM-001', 'University Administrator', 'admin@bup.edu.bd', '$2a$10$7rXmB8V9bE9tS3.8R9K3QeqM2Z0o1h8E5w6s9n1v3y8p0q2r4t6u8')
 ON CONFLICT (admin_id) DO NOTHING;
 
 -- ----------------------------------------------------------------------------
@@ -32,8 +31,7 @@ INSERT INTO admin_manages_cafeteria (admin_id, cafeteria_id) VALUES
 ('ADM-001', 'amitie'),
 ('ADM-001', 'vista'),
 ('ADM-001', 'pitstop'),
-('ADM-001', 'monpura'),
-('ADM-THP', 'monpura')
+('ADM-001', 'monpura')
 ON CONFLICT (admin_id, cafeteria_id) DO NOTHING;
 
 -- ----------------------------------------------------------------------------

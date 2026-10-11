@@ -235,11 +235,7 @@ export const TABLE_SCHEMAS = {
 // In-Memory Hybrid Relational Table Store (Pre-seeded strictly from seeds.sql data)
 const memoryStore = {
   system_admins: [
-    { admin_id: "ADM-001", name: "System Administrator (Master - All Canteens)", email: "admin@bup.edu.bd", password_hash: "$2a$10$hashedAdminPass...", created_at: "2026-10-01 08:00:00" },
-    { admin_id: "ADM-VST", name: "Vista Canteen Administrator", email: "admin.vista@bup.edu.bd", password_hash: "$2a$10$hashedAdminPass...", created_at: "2026-10-01 08:00:00" },
-    { admin_id: "ADM-AMT", name: "Amitie Canteen Administrator", email: "admin.amitie@bup.edu.bd", password_hash: "$2a$10$hashedAdminPass...", created_at: "2026-10-01 08:00:00" },
-    { admin_id: "ADM-PST", name: "Pitstop Canteen Administrator", email: "admin.pitstop@bup.edu.bd", password_hash: "$2a$10$hashedAdminPass...", created_at: "2026-10-01 08:00:00" },
-    { admin_id: "ADM-THP", name: "Third Place Canteen Administrator", email: "admin.monpura@bup.edu.bd", password_hash: "$2a$10$hashedAdminPass...", created_at: "2026-10-01 08:00:00" },
+    { admin_id: "ADM-001", name: "University Administrator", email: "admin@bup.edu.bd", password_hash: "$2a$10$hashedAdminPass...", created_at: "2026-10-01 08:00:00" },
   ],
   cafeterias: [
     { cafeteria_id: "amitie", name: "Amitie Cafeteria", location: "Academic Building Ground Floor", opening_hours: "08:00 AM - 06:00 PM", created_at: "2026-10-01 08:00:00" },
@@ -252,10 +248,6 @@ const memoryStore = {
     { admin_id: "ADM-001", cafeteria_id: "vista", assigned_at: "2026-10-01 08:00:00" },
     { admin_id: "ADM-001", cafeteria_id: "pitstop", assigned_at: "2026-10-01 08:00:00" },
     { admin_id: "ADM-001", cafeteria_id: "monpura", assigned_at: "2026-10-01 08:00:00" },
-    { admin_id: "ADM-VST", cafeteria_id: "vista", assigned_at: "2026-10-01 08:00:00" },
-    { admin_id: "ADM-AMT", cafeteria_id: "amitie", assigned_at: "2026-10-01 08:00:00" },
-    { admin_id: "ADM-PST", cafeteria_id: "pitstop", assigned_at: "2026-10-01 08:00:00" },
-    { admin_id: "ADM-THP", cafeteria_id: "monpura", assigned_at: "2026-10-01 08:00:00" },
   ],
   menu_items: [
     { item_id: "ami-01", name: "Paratha", category: "Breakfast", description: "Freshly rolled crispy layered flatbread", price: 10.0, is_available: true },

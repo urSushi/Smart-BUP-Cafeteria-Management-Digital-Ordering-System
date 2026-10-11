@@ -230,12 +230,8 @@ seedOperationalAccount({ role: "cafeteria_manager", identifier: "MGR-AMT", fullN
 seedOperationalAccount({ role: "cafeteria_manager", identifier: "MGR-PST", fullName: "Tariqul Islam (Pitstop Manager)", cafeteriaId: "pitstop" });
 seedOperationalAccount({ role: "cafeteria_manager", identifier: "MGR-THP", fullName: "Shamsur Rahman (Third Place Manager)", cafeteriaId: "monpura" });
 
-// System Admins (Master & Canteen-Specific)
-seedOperationalAccount({ role: "admin", identifier: "ADM-001", fullName: "System Administrator (Master - All Canteens)", cafeteriaId: "all", universityEmail: "admin@bup.edu.bd" });
-seedOperationalAccount({ role: "admin", identifier: "ADM-VST", fullName: "Vista Canteen Administrator", cafeteriaId: "vista", universityEmail: "admin.vista@bup.edu.bd" });
-seedOperationalAccount({ role: "admin", identifier: "ADM-AMT", fullName: "Amitie Canteen Administrator", cafeteriaId: "amitie", universityEmail: "admin.amitie@bup.edu.bd" });
-seedOperationalAccount({ role: "admin", identifier: "ADM-PST", fullName: "Pitstop Canteen Administrator", cafeteriaId: "pitstop", universityEmail: "admin.pitstop@bup.edu.bd" });
-seedOperationalAccount({ role: "admin", identifier: "ADM-THP", fullName: "Third Place Canteen Administrator", cafeteriaId: "monpura", universityEmail: "admin.monpura@bup.edu.bd" });
+// University Administrator (Single Main Admin for Central Campus)
+seedOperationalAccount({ role: "admin", identifier: "ADM-001", fullName: "University Administrator", cafeteriaId: "all", universityEmail: "admin@bup.edu.bd" });
 
 // --- Load & initialize persistent accounts registered by real users -------------
 const savedUsers = loadPersistentUsers();

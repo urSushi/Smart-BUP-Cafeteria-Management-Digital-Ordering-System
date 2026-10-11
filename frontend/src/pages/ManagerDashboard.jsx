@@ -109,7 +109,7 @@ export default function ManagerDashboard() {
     return (
       <div className="manager-shell" style={{ padding: 60, textAlign: "center" }}>
         <Spinner />
-        <p style={{ marginTop: 12, color: "#9ca3af" }}>Loading manager operational analytics...</p>
+        <p style={{ marginTop: 12, color: "var(--ink-soft)" }}>Loading manager operational analytics...</p>
       </div>
     );
   }

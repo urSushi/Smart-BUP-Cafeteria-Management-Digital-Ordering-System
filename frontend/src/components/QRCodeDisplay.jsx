@@ -138,8 +138,8 @@ export default function QRCodeDisplay({
       </div>
 
       {tokenText && (
-        <div style={{ marginTop: 8, fontSize: "0.88rem", fontWeight: 700, color: fgColor, letterSpacing: "0.5px" }}>
-          TOKEN: {tokenText}
+        <div className="qr-token-text">
+          {tokenText.startsWith("TOKEN:") || tokenText.startsWith("PAYABLE:") ? tokenText : `TOKEN: ${tokenText}`}
         </div>
       )}
     </div>

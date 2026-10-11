@@ -105,7 +105,7 @@
       "Breakfast",
       "Value Pick"
     ],
-    "stockQuantity": 60,
+    "stockQuantity": 57,
     "lowStockThreshold": 10,
     "isAvailable": true,
     "rating": 4.8,

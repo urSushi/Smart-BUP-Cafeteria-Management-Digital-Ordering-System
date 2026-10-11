@@ -128,9 +128,9 @@ export default function OrderTrackingModal({ order, isOpen, onClose, onOpenRevie
           </div>
         ) : isRefundPending ? (
           <div className="status-refund-pending-banner">
-            <Icon name="alertCircle" size={22} color="#b45309" />
+            <Icon name="alertCircle" size={22} color="var(--mustard-dark)" />
             <div>
-              <strong style={{ color: "#92400e" }}>30-Min Window Expired · Refund Pending via Admin</strong>
+              <strong style={{ color: "var(--mustard-dark)" }}>30-Min Window Expired · Refund Pending via Admin</strong>
               <div style={{ fontSize: "0.82rem", marginTop: 2 }}>
                 This prepaid order exceeded the 30-minute pickup window and has been cancelled.
                 Your payment of <strong>৳{order.total}</strong> is queued for return to your <strong>{order.paymentMethod?.toUpperCase()}</strong> account via the System Admin.

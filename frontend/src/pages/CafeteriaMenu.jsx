@@ -190,13 +190,13 @@ export default function CafeteriaMenu() {
                 display: "flex",
                 alignItems: "center",
                 gap: 14,
-                border: "1.5px solid #ef4444",
-                background: "rgba(239, 68, 68, 0.08)",
+                border: "1.5px solid var(--brick)",
+                background: "var(--brick-tint)",
               }}
             >
-              <Icon name="alertCircle" size={24} color="#dc2626" />
+              <Icon name="alertCircle" size={24} color="var(--brick)" />
               <div>
-                <strong style={{ fontSize: "1.05rem", color: "#dc2626" }}>
+                <strong style={{ fontSize: "1.05rem", color: "var(--brick)" }}>
                   Notice: {cafeteria.name} is Currently Closed
                 </strong>
                 <div style={{ fontSize: "0.88rem", marginTop: 4, color: "var(--ink-soft)" }}>

@@ -155,7 +155,7 @@ export default function AdminDashboard() {
     return (
       <div className="admin-shell" style={{ padding: 60, textAlign: "center" }}>
         <Spinner />
-        <p style={{ marginTop: 12, color: "#9ca3af" }}>Loading University Admin & IT Console...</p>
+        <p style={{ marginTop: 12, color: "var(--ink-soft)" }}>Loading University Admin & IT Console...</p>
       </div>
     );
   }
@@ -386,7 +386,7 @@ export default function AdminDashboard() {
                         <strong>{caf.ordersCount}</strong> orders
                       </td>
                       <td>
-                        <strong style={{ color: "#10b981" }}>৳{caf.revenueToday?.toLocaleString()}</strong>
+                        <strong style={{ color: "var(--teal)" }}>৳{caf.revenueToday?.toLocaleString()}</strong>
                       </td>
                       <td>
                         <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
@@ -523,7 +523,7 @@ export default function AdminDashboard() {
                       ? `${canteenInfo?.name} Refund Console (30-Minute Expiry)`
                       : "Mobile Banking Refund Console (30-Minute Expiry)"}
                   </h3>
-                  <span className="badge badge-open" style={{ background: "#fee2e2", color: "#b91c1c" }}>
+                  <span className="badge badge-pending-alert">
                     {pendingRefunds.length} Pending Approval
                   </span>
                 </div>
@@ -588,7 +588,7 @@ export default function AdminDashboard() {
                       </td>
                       <td>
                         <strong>{ord.userFullName}</strong>
-                        <div style={{ fontSize: "0.78rem", color: "#94a3b8" }}>{ord.userIdentifier}</div>
+                        <div style={{ fontSize: "0.78rem", color: "var(--ink-soft)" }}>{ord.userIdentifier}</div>
                       </td>
                       <td>
                         <strong style={{ fontFamily: "monospace", fontSize: "0.95rem" }}>
@@ -597,13 +597,7 @@ export default function AdminDashboard() {
                       </td>
                       <td>
                         <span
-                          className="badge"
-                          style={{
-                            background: ord.paymentMethod === "bkash" ? "#fce7f3" : "#ffedd5",
-                            color: ord.paymentMethod === "bkash" ? "#be185d" : "#c2410c",
-                            fontWeight: 700,
-                            textTransform: "uppercase",
-                          }}
+                          className={`badge ${ord.paymentMethod === "bkash" ? "mfs-badge-bkash" : "mfs-badge-nagad"}`}
                         >
                           {ord.paymentMethod}
                         </span>
@@ -616,13 +610,13 @@ export default function AdminDashboard() {
                           Placed: {new Date(ord.placedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                         </div>
                         {ord.cancelledAt && (
-                          <div style={{ fontSize: "0.75rem", color: "#ef4444" }}>
+                          <div style={{ fontSize: "0.75rem", color: "var(--brick)" }}>
                             Expired: {new Date(ord.cancelledAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                           </div>
                         )}
                       </td>
                       <td>
-                        <span style={{ fontSize: "0.78rem", color: "#b45309", maxWidth: 220, display: "inline-block" }}>
+                        <span style={{ fontSize: "0.78rem", color: "var(--mustard-dark)", maxWidth: 220, display: "inline-block" }}>
                           {ord.cancellationReason || "Exceeded 30-minute pickup window"}
                         </span>
                       </td>

@@ -177,7 +177,7 @@ export default function StaffDashboard() {
       {/* Low Stock Alert Warning Banner (FR-14) */}
       {lowStockAlerts.length > 0 && (
         <div className="staff-alert-banner">
-          <Icon name="alertCircle" size={18} color="#b45309" />
+          <Icon name="alertCircle" size={18} color="var(--mustard-dark)" />
           <span>
             <strong>LOW STOCK ALERT (FR-14):</strong> {lowStockAlerts.length} item(s) below threshold in this kitchen (
             {lowStockAlerts.map((i) => `${i.name}: ${i.stockQuantity} left`).join(", ")})!
@@ -258,7 +258,7 @@ export default function StaffDashboard() {
 
                     <div className="ticket-student">
                       <strong>{ord.userFullName}</strong>
-                      <div style={{ fontSize: "0.75rem", color: ord.paymentMethod === "cash" ? "#b45309" : "var(--teal)", fontWeight: 700, marginTop: 2 }}>
+                      <div style={{ fontSize: "0.75rem", color: ord.paymentMethod === "cash" ? "var(--mustard-dark)" : "var(--teal)", fontWeight: 700, marginTop: 2 }}>
                         {ord.paymentMethod === "cash" ? "⏱️ 15m Counter Pickup" : "🛡️ 30m Prepaid Window"} · {ord.paymentMethod.toUpperCase()}
                       </div>
                     </div>
@@ -306,7 +306,7 @@ export default function StaffDashboard() {
 
                     <div className="ticket-student">
                       <strong>{ord.userFullName}</strong>
-                      <div style={{ fontSize: "0.75rem", color: ord.paymentMethod === "cash" ? "#b45309" : "var(--teal)", fontWeight: 700, marginTop: 2 }}>
+                      <div style={{ fontSize: "0.75rem", color: ord.paymentMethod === "cash" ? "var(--mustard-dark)" : "var(--teal)", fontWeight: 700, marginTop: 2 }}>
                         {ord.paymentMethod === "cash" ? "⏱️ 15m Counter Window" : "🛡️ 30m Prepaid Window"} · {ord.paymentMethod.toUpperCase()}
                       </div>
                     </div>
@@ -356,7 +356,7 @@ export default function StaffDashboard() {
 
                     <div className="ticket-student">
                       <strong>{ord.userFullName}</strong> · Total: ৳{ord.total}
-                      <div style={{ fontSize: "0.75rem", color: ord.paymentMethod === "cash" ? "#b45309" : "var(--teal)", fontWeight: 700, marginTop: 2 }}>
+                      <div style={{ fontSize: "0.75rem", color: ord.paymentMethod === "cash" ? "var(--mustard-dark)" : "var(--teal)", fontWeight: 700, marginTop: 2 }}>
                         {ord.paymentMethod === "cash" ? "⏱️ 15m Counter Window" : "🛡️ 30m Prepaid Window"}
                       </div>
                     </div>

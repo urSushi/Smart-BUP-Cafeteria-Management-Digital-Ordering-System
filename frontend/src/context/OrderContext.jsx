@@ -47,11 +47,17 @@ export function OrderProvider({ children }) {
   const [loading, setLoading] = useState(false);
   const [trackingOrder, setTrackingOrder] = useState(null);
   const prevStatusesRef = useRef({});
+  const trackingOrderRef = useRef(trackingOrder);
+
+  useEffect(() => {
+    trackingOrderRef.current = trackingOrder;
+  }, [trackingOrder]);
 
   const refreshOrders = useCallback(async () => {
-    if (!authenticated) return;
+    if (!authenticated || !user) return;
     try {
-      const list = await apiService.getMyOrders(user?.id || 1);
+      const targetUserId = user.identifier || user.id;
+      const list = await apiService.getMyOrders(targetUserId);
       if (Array.isArray(list)) {
         // Detect status changes to "ready"
         list.forEach((ord) => {
@@ -68,22 +74,26 @@ export function OrderProvider({ children }) {
         setOrders(list);
 
         // Update tracking order if currently open
-        if (trackingOrder) {
-          const updated = list.find((o) => o.id === trackingOrder.id);
+        if (trackingOrderRef.current) {
+          const updated = list.find((o) => o.id === trackingOrderRef.current.id);
           if (updated) setTrackingOrder(updated);
         }
       }
     } catch (err) {
       console.warn("Orders fetch poll:", err.message);
     }
-  }, [authenticated, user, toast, trackingOrder]);
+  }, [authenticated, user, toast]);
 
-  // Initial fetch, live event listener, and polling loop
+  // Initial fetch, live event listener, and polling loop (reset on user switch)
   useEffect(() => {
-    if (!authenticated) {
+    if (!authenticated || !user) {
       setOrders([]);
+      setTrackingOrder(null);
+      prevStatusesRef.current = {};
       return;
     }
+    // Cleanly reset orders so previous user's orders never show
+    setOrders([]);
     refreshOrders();
     const unsubscribe = subscribeSync(refreshOrders);
     const interval = setInterval(refreshOrders, 5000);
@@ -91,7 +101,7 @@ export function OrderProvider({ children }) {
       unsubscribe();
       clearInterval(interval);
     };
-  }, [authenticated, refreshOrders]);
+  }, [authenticated, user?.id, user?.identifier, refreshOrders]);
 
   const activeOrders = orders.filter((o) => ["placed", "preparing", "ready"].includes(o.orderStatus));
   const pastOrders = orders.filter((o) => !["placed", "preparing", "ready"].includes(o.orderStatus));

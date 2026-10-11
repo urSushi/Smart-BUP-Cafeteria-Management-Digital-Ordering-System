@@ -3,6 +3,8 @@ import QRCodeDisplay from "./QRCodeDisplay.jsx";
 import { useOrders } from "../context/OrderContext.jsx";
 import Icon from "./Icons.jsx";
 import { Spinner } from "./Loader.jsx";
+import { apiService } from "../services/apiService.js";
+import { subscribeSync } from "../utils/liveCafeterias.js";
 
 const STAGES = [
   { key: "placed", label: "Placed", desc: "Order received by cafeteria", icon: "checkCircle" },
@@ -17,6 +19,9 @@ export default function OrderTrackingModal({ order, isOpen, onClose, onOpenRevie
 
   // Live Pickup Deadline Countdown (15 mins for Counter, 30 mins for Mobile Banking)
   const [remainingSec, setRemainingSec] = useState(0);
+
+  // Live FIFO Kitchen Queue Standing
+  const [queueInfo, setQueueInfo] = useState({ position: 1, ahead: 0 });
 
   useEffect(() => {
     if (!order) return;
@@ -36,6 +41,38 @@ export default function OrderTrackingModal({ order, isOpen, onClose, onOpenRevie
 
     return () => clearInterval(interval);
   }, [order]);
+
+  useEffect(() => {
+    if (!order || !isOpen) return;
+    if (order.orderStatus !== "placed" && order.orderStatus !== "preparing") return;
+
+    let mounted = true;
+    async function fetchQueue() {
+      try {
+        const cafOrders = await apiService.getCafeteriaOrders(order.cafeteriaId);
+        if (!mounted || !Array.isArray(cafOrders)) return;
+        const activeEarlier = cafOrders.filter(
+          (o) =>
+            o.id !== order.id &&
+            ["placed", "preparing"].includes(o.orderStatus) &&
+            new Date(o.placedAt).getTime() < new Date(order.placedAt).getTime()
+        );
+        setQueueInfo({
+          position: activeEarlier.length + 1,
+          ahead: activeEarlier.length,
+        });
+      } catch {}
+    }
+
+    fetchQueue();
+    const unsub = subscribeSync(fetchQueue);
+    const interval = setInterval(fetchQueue, 4000);
+    return () => {
+      mounted = false;
+      unsub();
+      clearInterval(interval);
+    };
+  }, [order?.id, order?.orderStatus, order?.placedAt, order?.cafeteriaId, isOpen]);
 
   if (!isOpen || !order) return null;
 
@@ -164,6 +201,28 @@ export default function OrderTrackingModal({ order, isOpen, onClose, onOpenRevie
                 {order.orderStatus === "ready"
                   ? `Please head to ${order.pickupCounter} with your token or QR code!`
                   : `Estimated kitchen prep: ~${order.prepTimeMinutes} mins from placement.`}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Real-time FIFO Queue Status for Placed & Cooking Orders */}
+        {!isCancelled && ["placed", "preparing"].includes(order.orderStatus) && (
+          <div className="fifo-student-queue-banner">
+            <div className={`fifo-queue-rank ${queueInfo.position === 1 ? "rank-lead" : ""}`}>
+              <span className="rank-num">#{queueInfo.position}</span>
+              <span className="rank-label">IN LINE</span>
+            </div>
+            <div className="fifo-queue-details">
+              <strong>
+                {queueInfo.position === 1
+                  ? "🥇 1st in Line — Next Up for Preparation!"
+                  : `⏳ Kitchen Queue: #${queueInfo.position} in Line`}
+              </strong>
+              <div style={{ fontSize: "0.8rem", color: "var(--ink-soft)", marginTop: 2 }}>
+                {queueInfo.position === 1
+                  ? "Your order was placed first and has priority in the kitchen."
+                  : `${queueInfo.ahead} earlier ${queueInfo.ahead === 1 ? "order is" : "orders are"} being prepared ahead of yours.`}
               </div>
             </div>
           </div>

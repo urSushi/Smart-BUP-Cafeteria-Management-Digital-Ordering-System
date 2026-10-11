@@ -1,13 +1,20 @@
-import React, { createContext, useContext, useState, useEffect, useMemo } from "react";
+import React, { createContext, useContext, useState, useEffect, useMemo, useRef } from "react";
+import { useAuth } from "./AuthContext.jsx";
 import { useToast } from "./ToastContext.jsx";
 import { apiService } from "../services/apiService.js";
 
 const CartContext = createContext(null);
-const CART_STORAGE_KEY = "sbcms_cart_v1";
 
-function loadCart() {
+function getCartStorageKey(user) {
+  if (!user) return "sbcms_cart_guest";
+  const id = user.identifier || user.id || "anonymous";
+  return `sbcms_cart_user_${id}`;
+}
+
+function loadCartForUser(user) {
   try {
-    const raw = localStorage.getItem(CART_STORAGE_KEY);
+    const key = getCartStorageKey(user);
+    const raw = localStorage.getItem(key);
     return raw ? JSON.parse(raw) : { items: [], cafeteriaId: null, promo: null };
   } catch {
     return { items: [], cafeteriaId: null, promo: null };
@@ -15,15 +22,28 @@ function loadCart() {
 }
 
 export function CartProvider({ children }) {
-  const [cartState, setCartState] = useState(() => loadCart());
+  const { user } = useAuth();
+  const [cartState, setCartState] = useState(() => loadCartForUser(user));
   const [isCartOpen, setIsCartOpen] = useState(false);
   const toast = useToast();
+  const prevUserKeyRef = useRef(getCartStorageKey(user));
 
+  // Cleanly swap cart when switching accounts (e.g., student logs out, faculty logs in)
+  useEffect(() => {
+    const currentKey = getCartStorageKey(user);
+    if (prevUserKeyRef.current !== currentKey) {
+      prevUserKeyRef.current = currentKey;
+      setCartState(loadCartForUser(user));
+    }
+  }, [user]);
+
+  // Persist cart to user's isolated storage key
   useEffect(() => {
     try {
-      localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cartState));
+      const key = getCartStorageKey(user);
+      localStorage.setItem(key, JSON.stringify(cartState));
     } catch {}
-  }, [cartState]);
+  }, [cartState, user]);
 
   const items = cartState.items || [];
   const cafeteriaId = cartState.cafeteriaId;
@@ -52,6 +72,23 @@ export function CartProvider({ children }) {
 
   function addToCart(item, qty = 1, notes = "") {
     if (!item) return;
+
+    // 1. Stock check: Ensure item is available and has remaining stock
+    if (item.stockQuantity !== undefined && item.stockQuantity <= 0) {
+      toast.error(`"${item.name}" is sold out and cannot be added to cart.`);
+      return false;
+    }
+
+    const existingItem = items.find((i) => i.id === item.id);
+    const existingQty = existingItem ? existingItem.qty : 0;
+    const maxStock = item.stockQuantity !== undefined ? item.stockQuantity : 99;
+
+    if (existingQty + qty > maxStock) {
+      toast.warning(
+        `Cannot add ${qty} more. Only ${maxStock - existingQty} additional portion(s) available in kitchen stock.`
+      );
+      return false;
+    }
 
     // Check cafeteria match
     if (cafeteriaId && items.length > 0 && cafeteriaId !== item.cafeteriaId) {
@@ -99,6 +136,15 @@ export function CartProvider({ children }) {
       removeFromCart(itemId);
       return;
     }
+
+    const targetItem = items.find((i) => i.id === itemId);
+    const maxStock = targetItem && targetItem.stockQuantity !== undefined ? targetItem.stockQuantity : 99;
+
+    if (newQty > maxStock) {
+      toast.warning(`Maximum available stock for "${targetItem?.name}" is ${maxStock}.`);
+      newQty = maxStock;
+    }
+
     setCartState((prev) => ({
       ...prev,
       items: prev.items.map((i) => (i.id === itemId ? { ...i, qty: newQty } : i)),

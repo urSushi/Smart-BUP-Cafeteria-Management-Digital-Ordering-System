@@ -245,11 +245,20 @@ export function getOrderByToken(tokenNumber) {
   return orders.find((o) => o.tokenNumber.toUpperCase() === clean) || null;
 }
 
-export function getOrdersByUser(userId) {
-  if (!userId) return [];
+export function getOrdersByUser(userKey, secondaryKey = null) {
+  if (!userKey && !secondaryKey) return [];
   checkAndExpireOrders();
+  const k1 = userKey ? String(userKey).toLowerCase().trim() : null;
+  const k2 = secondaryKey ? String(secondaryKey).toLowerCase().trim() : null;
+
   return orders
-    .filter((o) => o.userId === userId || o.userIdentifier === String(userId))
+    .filter((o) => {
+      const oUserId = String(o.userId ?? "").toLowerCase().trim();
+      const oUserIdent = String(o.userIdentifier ?? "").toLowerCase().trim();
+      if (k1 && (oUserId === k1 || oUserIdent === k1)) return true;
+      if (k2 && (oUserId === k2 || oUserIdent === k2)) return true;
+      return false;
+    })
     .sort((a, b) => new Date(b.placedAt) - new Date(a.placedAt));
 }
 
@@ -320,9 +329,9 @@ export function createOrder(data) {
     id: orderId,
     tokenNumber,
     qrCodeData,
-    userId: data.userId || 1,
-    userFullName: data.userFullName || "BUP Student",
-    userIdentifier: data.userIdentifier || "2021-1-60-001",
+    userId: data.userId ?? (data.userIdentifier || "guest"),
+    userFullName: data.userFullName || "BUP User",
+    userIdentifier: data.userIdentifier || String(data.userId || "guest"),
     mobileNumber: data.mobileNumber || "01711223344",
     cafeteriaId: data.cafeteriaId,
     cafeteriaName: caf.name,

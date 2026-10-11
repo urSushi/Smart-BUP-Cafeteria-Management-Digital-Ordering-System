@@ -108,7 +108,7 @@ export const apiService = {
     apiRequest("/orders", { method: "POST", body: JSON.stringify(orderPayload) }),
 
   getMyOrders: (userId) =>
-    apiRequest(`/orders/my-orders?userId=${userId || 1}`, { method: "GET" }),
+    apiRequest(`/orders/my-orders?userId=${encodeURIComponent(userId || "")}`, { method: "GET" }),
 
   getCafeteriaOrders: (cafeteriaId) =>
     apiRequest(`/orders/cafeteria/${cafeteriaId}`, { method: "GET" }),

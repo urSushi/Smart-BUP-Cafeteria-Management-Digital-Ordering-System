@@ -43,6 +43,18 @@ export function getManagerAnalytics(req, res) {
   const totalStock = menuItems.reduce((sum, i) => sum + i.stockQuantity, 0);
   const lowStockCount = menuItems.filter((i) => i.stockQuantity <= i.lowStockThreshold).length;
 
+  let soldUnitsToday = 0;
+  for (const o of orders) {
+    if (["completed", "ready", "preparing", "placed"].includes(o.orderStatus)) {
+      for (const it of o.items) {
+        soldUnitsToday += (Number(it.qty) || 1);
+      }
+    }
+  }
+  const turnoverRate = (totalStock + soldUnitsToday) > 0
+    ? `${((soldUnitsToday / (totalStock + soldUnitsToday)) * 100).toFixed(1)}%`
+    : "0.0%";
+
   return res.json({
     cafeteriaId,
     todayRevenue,
@@ -57,7 +69,8 @@ export function getManagerAnalytics(req, res) {
     inventoryStats: {
       totalStockUnits: totalStock,
       lowStockAlertCount: lowStockCount,
-      turnoverRate: "84.2%",
+      soldUnitsToday,
+      turnoverRate,
     },
   });
 }

@@ -7,6 +7,7 @@ import QRScannerModal from "../components/QRScannerModal.jsx";
 import Icon from "../components/Icons.jsx";
 import { Spinner } from "../components/Loader.jsx";
 import ThemeToggle from "../components/ThemeToggle.jsx";
+import { broadcastSync, subscribeSync } from "../utils/liveCafeterias.js";
 
 const CANTEEN_INFO = {
   vista: { name: "Vista Cafe", location: "Academic Building GF", code: "VST" },
@@ -59,14 +60,19 @@ export default function StaffDashboard() {
 
   useEffect(() => {
     loadData();
-    const timer = setInterval(loadData, 5000);
-    return () => clearInterval(timer);
+    const unsub = subscribeSync(loadData);
+    const timer = setInterval(loadData, 4000);
+    return () => {
+      unsub();
+      clearInterval(timer);
+    };
   }, [loadData]);
 
   // Status transitions (FR-10)
   async function handleStatusChange(orderId, newStatus) {
     try {
       await apiService.updateOrderStatus(orderId, newStatus);
+      broadcastSync("ORDER_STATUS_CHANGED", { orderId, newStatus, cafeteriaId: activeCafeteriaId });
       toast.success(`Order updated to "${newStatus}".`);
       await loadData();
     } catch (err) {
@@ -81,6 +87,7 @@ export default function StaffDashboard() {
     const newQty = Math.max(0, item.stockQuantity + delta);
     try {
       await apiService.updateStock(itemId, newQty);
+      broadcastSync("STOCK_UPDATED", { itemId, newQty, cafeteriaId: activeCafeteriaId });
       toast.info(`Updated stock for ${item.name} to ${newQty}.`);
       await loadData();
     } catch (err) {
@@ -97,6 +104,7 @@ export default function StaffDashboard() {
         ...newItem,
         cafeteriaId: activeCafeteriaId,
       });
+      broadcastSync("STOCK_UPDATED", { cafeteriaId: activeCafeteriaId });
       toast.success(`Added "${newItem.name}" to menu!`);
       setShowAddModal(false);
       setNewItem({
@@ -114,10 +122,23 @@ export default function StaffDashboard() {
     }
   }
 
-  const placedOrders = orders.filter((o) => o.orderStatus === "placed");
-  const preparingOrders = orders.filter((o) => o.orderStatus === "preparing");
-  const readyOrders = orders.filter((o) => o.orderStatus === "ready");
-  const completedOrders = orders.filter((o) => o.orderStatus === "completed").slice(0, 10);
+  // FIFO Queue Ordering: Earliest placed orders are prioritized first (FR-FIFO)
+  const placedOrders = [...orders]
+    .filter((o) => o.orderStatus === "placed")
+    .sort((a, b) => new Date(a.placedAt) - new Date(b.placedAt));
+
+  const preparingOrders = [...orders]
+    .filter((o) => o.orderStatus === "preparing")
+    .sort((a, b) => new Date(a.placedAt) - new Date(b.placedAt));
+
+  const readyOrders = [...orders]
+    .filter((o) => o.orderStatus === "ready")
+    .sort((a, b) => new Date(b.readyAt || b.placedAt) - new Date(a.readyAt || a.placedAt));
+
+  const completedOrders = [...orders]
+    .filter((o) => o.orderStatus === "completed")
+    .sort((a, b) => new Date(b.completedAt || b.placedAt) - new Date(a.completedAt || a.placedAt))
+    .slice(0, 10);
 
   return (
     <div className="staff-portal-shell">
@@ -249,42 +270,64 @@ export default function StaffDashboard() {
                 <span className="kds-count">{placedOrders.length}</span>
               </div>
               <div className="kds-cards-list">
-                {placedOrders.map((ord) => (
-                  <div key={ord.id} className="kds-ticket card">
-                    <div className="ticket-top">
-                      <span className="ticket-token">#{ord.tokenNumber}</span>
-                      <span className="ticket-time">{new Date(ord.placedAt).toLocaleTimeString()}</span>
-                    </div>
+                {placedOrders.map((ord, idx) => {
+                  const waitMins = Math.max(0, Math.floor((Date.now() - new Date(ord.placedAt).getTime()) / 60000));
+                  return (
+                    <div key={ord.id} className={`kds-ticket card ${idx === 0 ? "ticket-first-priority" : ""}`}>
+                      {idx === 0 ? (
+                        <div className="fifo-badge-priority">
+                          <Icon name="checkCircle" size={13} />
+                          <span>🥇 #1 PRIORITY NEXT UP · SERVE FIRST</span>
+                        </div>
+                      ) : (
+                        <div className="fifo-badge-queue">
+                          <Icon name="clock" size={12} />
+                          <span>#{idx + 1} IN QUEUE</span>
+                        </div>
+                      )}
 
-                    <div className="ticket-student">
-                      <strong>{ord.userFullName}</strong>
-                      <div style={{ fontSize: "0.75rem", color: ord.paymentMethod === "cash" ? "var(--mustard-dark)" : "var(--teal)", fontWeight: 700, marginTop: 2 }}>
-                        {ord.paymentMethod === "cash" ? "⏱️ 15m Counter Pickup" : "🛡️ 30m Prepaid Window"} · {ord.paymentMethod.toUpperCase()}
+                      <div className="ticket-top">
+                        <span className="ticket-token">#{ord.tokenNumber}</span>
+                        <span className="ticket-time" title={new Date(ord.placedAt).toLocaleString()}>
+                          {new Date(ord.placedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })} ({waitMins}m ago)
+                        </span>
+                      </div>
+
+                      <div className="ticket-student">
+                        <strong>{ord.userFullName}</strong>
+                        {ord.userIdentifier && (
+                          <span style={{ fontSize: "0.75rem", opacity: 0.75, marginLeft: 4 }}>
+                            · ID: {ord.userIdentifier}
+                          </span>
+                        )}
+                        <div style={{ fontSize: "0.75rem", color: ord.paymentMethod === "cash" ? "var(--mustard-dark)" : "var(--teal)", fontWeight: 700, marginTop: 2 }}>
+                          {ord.paymentMethod === "cash" ? "⏱️ 15m Counter Pickup" : "🛡️ 30m Prepaid Window"} · {ord.paymentMethod.toUpperCase()}
+                        </div>
+                      </div>
+
+                      <div className="ticket-items">
+                        {ord.items.map((it, itemIdx) => (
+                          <div key={itemIdx} className="ticket-item-row">
+                            <span className="qty-tag">{it.qty}x</span>
+                            <span className="item-txt">{it.name}</span>
+                            {it.notes && <span className="ticket-note">Note: {it.notes}</span>}
+                          </div>
+                        ))}
+                      </div>
+
+                      <div className="ticket-actions">
+                        <button
+                          type="button"
+                          className="btn btn-primary btn-block btn-sm"
+                          onClick={() => handleStatusChange(ord.id, "preparing")}
+                        >
+                          <Icon name="utensils" size={14} />
+                          <span>Start Cooking</span>
+                        </button>
                       </div>
                     </div>
-
-                    <div className="ticket-items">
-                      {ord.items.map((it, idx) => (
-                        <div key={idx} className="ticket-item-row">
-                          <span className="qty-tag">{it.qty}x</span>
-                          <span className="item-txt">{it.name}</span>
-                          {it.notes && <span className="ticket-note">Note: {it.notes}</span>}
-                        </div>
-                      ))}
-                    </div>
-
-                    <div className="ticket-actions">
-                      <button
-                        type="button"
-                        className="btn btn-primary btn-block btn-sm"
-                        onClick={() => handleStatusChange(ord.id, "preparing")}
-                      >
-                        <Icon name="utensils" size={14} />
-                        <span>Start Cooking</span>
-                      </button>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
                 {placedOrders.length === 0 && <div className="kds-empty">No new incoming orders</div>}
               </div>
             </div>
@@ -297,8 +340,20 @@ export default function StaffDashboard() {
                 <span className="kds-count">{preparingOrders.length}</span>
               </div>
               <div className="kds-cards-list">
-                {preparingOrders.map((ord) => (
-                  <div key={ord.id} className="kds-ticket card ticket-prep">
+                {preparingOrders.map((ord, idx) => (
+                  <div key={ord.id} className={`kds-ticket card ticket-prep ${idx === 0 ? "ticket-prep-lead" : ""}`}>
+                    {idx === 0 ? (
+                      <div className="fifo-badge-cooking-lead">
+                        <Icon name="utensils" size={12} />
+                        <span>🍳 #1 CURRENT COOKING FOCUS</span>
+                      </div>
+                    ) : (
+                      <div className="fifo-badge-queue">
+                        <Icon name="clock" size={12} />
+                        <span>#{idx + 1} COOKING IN PARALLEL</span>
+                      </div>
+                    )}
+
                     <div className="ticket-top">
                       <span className="ticket-token">#{ord.tokenNumber}</span>
                       <span className="ticket-time">Prep: ~{ord.prepTimeMinutes}m</span>
@@ -306,14 +361,19 @@ export default function StaffDashboard() {
 
                     <div className="ticket-student">
                       <strong>{ord.userFullName}</strong>
+                      {ord.userIdentifier && (
+                        <span style={{ fontSize: "0.75rem", opacity: 0.75, marginLeft: 4 }}>
+                          · ID: {ord.userIdentifier}
+                        </span>
+                      )}
                       <div style={{ fontSize: "0.75rem", color: ord.paymentMethod === "cash" ? "var(--mustard-dark)" : "var(--teal)", fontWeight: 700, marginTop: 2 }}>
                         {ord.paymentMethod === "cash" ? "⏱️ 15m Counter Window" : "🛡️ 30m Prepaid Window"} · {ord.paymentMethod.toUpperCase()}
                       </div>
                     </div>
 
                     <div className="ticket-items">
-                      {ord.items.map((it, idx) => (
-                        <div key={idx} className="ticket-item-row">
+                      {ord.items.map((it, itemIdx) => (
+                        <div key={itemIdx} className="ticket-item-row">
                           <span className="qty-tag">{it.qty}x</span>
                           <span className="item-txt">{it.name}</span>
                           {it.notes && <span className="ticket-note">Note: {it.notes}</span>}

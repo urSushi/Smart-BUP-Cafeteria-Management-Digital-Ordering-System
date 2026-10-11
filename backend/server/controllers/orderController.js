@@ -42,9 +42,9 @@ export function placeOrder(req, res) {
       paymentMethod: paymentMethod || "bkash",
       transactionId: transactionId || null,
       mobileNumber: mobileNumber || req.user?.phone || "01711223344",
-      userFullName: userFullName || req.user?.fullName || "BUP Student",
-      userIdentifier: userIdentifier || req.user?.identifier || "2021-1-60-001",
-      userId: req.user?.id || 1,
+      userFullName: userFullName || req.user?.fullName || (req.user?.role === "faculty" ? "BUP Faculty" : "BUP User"),
+      userIdentifier: userIdentifier || req.user?.identifier || (req.user?.id ? String(req.user.id) : "guest"),
+      userId: req.user?.id || req.body.userId || req.user?.identifier || userIdentifier || "guest",
     });
 
     return res.status(201).json({
@@ -57,8 +57,12 @@ export function placeOrder(req, res) {
 }
 
 export function getUserOrders(req, res) {
-  const userId = req.user?.id || req.query.userId || 1;
-  const list = getOrdersByUser(userId);
+  const primaryKey = req.user?.identifier || req.query.userIdentifier || req.query.userId;
+  const secondaryKey = req.user?.id ? String(req.user.id) : null;
+  if (!primaryKey && !secondaryKey) {
+    return res.json([]);
+  }
+  const list = getOrdersByUser(primaryKey, secondaryKey);
   return res.json(list);
 }
 

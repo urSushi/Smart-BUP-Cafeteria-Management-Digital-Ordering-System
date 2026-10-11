@@ -7,6 +7,7 @@ import { useOrders } from "../context/OrderContext.jsx";
 import QRCodeDisplay from "./QRCodeDisplay.jsx";
 import Icon from "./Icons.jsx";
 import { Spinner } from "./Loader.jsx";
+import { broadcastSync } from "../utils/liveCafeterias.js";
 
 // Audio tone synthesizer for QR scan acoustic feedback
 function playScanSound(success = true) {
@@ -104,12 +105,13 @@ export default function PaymentModal({ isOpen, onClose, onOrderConfirmed }) {
         paymentMethod: activeMethod,
         transactionId,
         mobileNumber: activeMethod !== "cash" ? mobileNumber : (user?.phone || "01711223344"),
-        userFullName: user?.fullName || "BUP Student",
-        userIdentifier: user?.identifier || "2021-1-60-001",
-        userId: user?.id || 1,
+        userFullName: user?.fullName || (user?.role === "faculty" ? "BUP Faculty" : "BUP User"),
+        userIdentifier: user?.identifier || (user?.id ? `USER-${user.id}` : "guest"),
+        userId: user?.id || user?.identifier || "guest",
       };
 
       const res = await apiService.placeOrder(orderPayload);
+      broadcastSync("ORDER_PLACED", { orderId: res.order.id, cafeteriaId: cartCafeteria });
       clearCart();
       toast.success(`Order placed! Your pickup token is #${res.order.tokenNumber}.`);
       await refreshOrders();

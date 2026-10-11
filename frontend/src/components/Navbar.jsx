@@ -32,6 +32,7 @@ export default function Navbar() {
   const [activeSection, setActiveSection] = useState(() => {
     if (typeof window !== "undefined" && window.location.hash) {
       const h = window.location.hash.replace("#", "");
+      if (h === "cafeterias") return "cafeterias";
       if (h === "about" || h === "features") return "features";
       if (h === "how-it-works") return "how-it-works";
       if (h === "faq") return "faq";
@@ -71,6 +72,7 @@ export default function Navbar() {
             { id: "faq", name: "faq" },
             { id: "features", altId: "about", name: "features" },
             { id: "how-it-works", name: "how-it-works" },
+            { id: "cafeterias", name: "cafeterias" },
           ];
 
           for (const sec of sections) {
@@ -210,14 +212,17 @@ export default function Navbar() {
               <>
                 <Link
                   to="/home"
-                  className={location.pathname === "/home" || location.pathname.startsWith("/cafeteria") ? "active" : ""}
+                  className={`nav-link-btn ${location.pathname === "/home" || location.pathname.startsWith("/cafeteria") ? "active" : ""}`}
                   onClick={() => {
                     if (location.pathname === "/home") window.scrollTo({ top: 0, behavior: "smooth" });
                   }}
                 >
                   Cafeterias
                 </Link>
-                <Link to="/orders" className={location.pathname === "/orders" ? "active" : ""}>
+                <Link
+                  to="/orders"
+                  className={`nav-link-btn ${location.pathname === "/orders" ? "active" : ""}`}
+                >
                   <span>My Orders</span>
                   {activeOrders && activeOrders.length > 0 && (
                     <span className="nav-badge-pill">{activeOrders.length}</span>
@@ -228,7 +233,7 @@ export default function Navbar() {
                 {role === "cafeteria_staff" && (
                   <Link
                     to="/staff/dashboard"
-                    className={`portal-nav-link ${location.pathname.startsWith("/staff") ? "active" : ""}`}
+                    className={`nav-link-btn portal-nav-link ${location.pathname.startsWith("/staff") ? "active" : ""}`}
                   >
                     <Icon name="utensils" size={14} />
                     <span>Kitchen KDS</span>
@@ -238,7 +243,7 @@ export default function Navbar() {
                 {role === "cafeteria_manager" && (
                   <Link
                     to="/manager/dashboard"
-                    className={`portal-nav-link ${location.pathname.startsWith("/manager") ? "active" : ""}`}
+                    className={`nav-link-btn portal-nav-link ${location.pathname.startsWith("/manager") ? "active" : ""}`}
                   >
                     <Icon name="shield" size={14} />
                     <span>Manager Console</span>
@@ -248,7 +253,7 @@ export default function Navbar() {
                 {role === "admin" && (
                   <Link
                     to="/admin/dashboard"
-                    className={`portal-nav-link ${location.pathname.startsWith("/admin") ? "active" : ""}`}
+                    className={`nav-link-btn portal-nav-link ${location.pathname.startsWith("/admin") ? "active" : ""}`}
                   >
                     <Icon name="shield" size={14} />
                     <span>System Administrator</span>
@@ -264,12 +269,13 @@ export default function Navbar() {
                 >
                   Home
                 </button>
-                <Link
-                  to="/home"
-                  className={`nav-link-btn ${location.pathname === "/home" || location.pathname.startsWith("/cafeteria") ? "active" : ""}`}
+                <button
+                  type="button"
+                  className={`nav-link-btn ${((location.pathname === "/" && activeSection === "cafeterias") || location.pathname === "/home" || location.pathname.startsWith("/cafeteria")) ? "active" : ""}`}
+                  onClick={(e) => handleScrollToSection(e, "cafeterias")}
                 >
                   Cafeterias
-                </Link>
+                </button>
                 <button
                   type="button"
                   className={`nav-link-btn ${location.pathname === "/" && activeSection === "features" ? "active" : ""}`}
@@ -536,14 +542,14 @@ export default function Navbar() {
                 <span>Home</span>
                 <Icon name="chevronRight" size={16} />
               </button>
-              <Link
-                to="/home"
-                className={`mobile-nav-link ${location.pathname === "/home" ? "active" : ""}`}
-                onClick={() => setOpen(false)}
+              <button
+                type="button"
+                className={`mobile-nav-link ${((location.pathname === "/" && activeSection === "cafeterias") || location.pathname === "/home") ? "active" : ""}`}
+                onClick={(e) => handleScrollToSection(e, "cafeterias")}
               >
                 <span>Cafeterias</span>
                 <Icon name="chevronRight" size={16} />
-              </Link>
+              </button>
               <button
                 type="button"
                 className={`mobile-nav-link ${location.pathname === "/" && activeSection === "features" ? "active" : ""}`}

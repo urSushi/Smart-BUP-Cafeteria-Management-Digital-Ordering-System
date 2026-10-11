@@ -638,8 +638,11 @@ select.input option[value=""] {
   transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1);
   will-change: transform;
 }
+.brand:hover {
+  transform: translateY(-1.5px);
+}
 .brand:active {
-  transform: scale(0.97);
+  transform: translateY(1px) scale(0.96);
   transition-duration: 0.06s;
 }
 .brand-mark {
@@ -766,6 +769,18 @@ select.input option[value=""] {
   user-select: none;
   -webkit-tap-highlight-color: transparent;
   will-change: transform;
+  transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+              background-color 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+              color 0.18s ease,
+              box-shadow 0.2s ease,
+              border-color 0.2s ease;
+}
+.nav-actions .btn:hover {
+  transform: translateY(-1.5px);
+}
+.nav-actions .btn:active {
+  transform: translateY(1px) scale(0.96) !important;
+  transition-duration: 0.06s !important;
 }
 .nav-actions .btn-ghost {
   padding: 0 14px;
@@ -800,7 +815,7 @@ select.input option[value=""] {
   box-shadow: var(--shadow-subtle);
 }
 .nav-user-btn:active {
-  transform: translateY(1px) scale(0.97);
+  transform: translateY(1px) scale(0.96);
   transition-duration: 0.06s;
 }
 .nav-avatar {
@@ -961,9 +976,10 @@ select.input option[value=""] {
 }
 .nav-hamburger:hover {
   background: rgba(15, 118, 110, 0.08);
+  transform: translateY(-1.5px);
 }
 .nav-hamburger:active {
-  transform: scale(0.92);
+  transform: translateY(1px) scale(0.96);
   transition-duration: 0.06s;
 }
 
@@ -1012,7 +1028,8 @@ select.input option[value=""] {
   transform: translateX(3px);
 }
 .mobile-nav-link:active {
-  transform: scale(0.98);
+  transform: scale(0.96);
+  transition-duration: 0.06s;
 }
 .mobile-nav-link.text-danger { color: var(--brick); }
 .mobile-nav-link.text-danger:hover { background: var(--brick-tint); }
@@ -2698,12 +2715,12 @@ select.input option[value=""] {
 }
 .nav-cart-btn:hover {
   background: rgba(15, 118, 110, 0.18);
-  transform: translateY(-2px) scale(1.02);
+  transform: translateY(-1.5px);
   box-shadow: 0 4px 14px rgba(15, 118, 110, 0.2);
 }
 .nav-cart-btn:active {
-  transform: scale(0.96) translateY(0.5px);
-  transition-duration: 0.08s;
+  transform: translateY(1px) scale(0.96);
+  transition-duration: 0.06s;
 }
 .nav-cart-badge {
   background: var(--mustard-dark);
@@ -4889,8 +4906,8 @@ select.input option[value=""] {
   box-shadow: 0 0 16px rgba(15, 118, 110, 0.25);
 }
 .theme-toggle-btn:active {
-  transform: translateY(1px) scale(0.92) rotate(15deg);
-  transition-duration: 0.08s;
+  transform: translateY(1px) scale(0.96);
+  transition-duration: 0.06s;
 }
 .theme-toggle-icon-wrap {
   display: flex;

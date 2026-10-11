@@ -96,7 +96,7 @@ export default function GuestSignup() {
             </div>
 
             <div className="field">
-              <label>Personal Email</label>
+              <label>Email Address</label>
               <input
                 type="email"
                 className="input"

@@ -323,14 +323,22 @@ export const mockAuth = {
   async register(payload) {
     await sleep(500);
     const identifier = payload.universityId || payload.facultyId || payload.officerId || payload.staffId;
+    const personalEmail = (payload.personalEmail || payload.email || "").trim();
+    const universityEmail = (payload.universityEmail || "").trim();
+
+    if (!personalEmail) {
+      throw new Error("Email Address is mandatory.");
+    }
+
     const existing = mockUsers.find(
       (u) =>
-        u.identifier?.toLowerCase() === identifier?.toLowerCase() ||
-        (payload.universityEmail && u.universityEmail?.toLowerCase() === payload.universityEmail.toLowerCase())
+        (identifier && u.identifier?.toLowerCase() === identifier?.toLowerCase()) ||
+        (personalEmail && (u.personalEmail?.toLowerCase() === personalEmail.toLowerCase() || u.universityEmail?.toLowerCase() === personalEmail.toLowerCase())) ||
+        (universityEmail && (u.universityEmail?.toLowerCase() === universityEmail.toLowerCase() || u.personalEmail?.toLowerCase() === universityEmail.toLowerCase()))
     );
 
     if (existing) {
-      throw new Error("An account with this ID or university email already exists.");
+      throw new Error("An account with this ID or email address already exists.");
     }
 
     const newUser = {
@@ -338,8 +346,8 @@ export const mockAuth = {
       role: payload.role || "student",
       fullName: payload.fullName,
       identifier,
-      universityEmail: payload.universityEmail,
-      personalEmail: payload.personalEmail || null,
+      universityEmail: universityEmail || null,
+      personalEmail,
       department: payload.department,
       program: payload.program || null,
       semester: payload.semester || null,
@@ -358,19 +366,20 @@ export const mockAuth = {
     mockUsers.push(newUser);
     saveStored(MOCK_STORAGE_KEY, mockUsers);
 
-    const email = payload.universityEmail || payload.personalEmail;
+    const email = personalEmail || universityEmail;
     const otpRes = await this.sendOtp(email, "register");
-    if (payload.personalEmail && payload.personalEmail.toLowerCase() !== email.toLowerCase()) {
+    if (universityEmail && universityEmail.toLowerCase() !== email.toLowerCase()) {
       const existingOtp = otpStore.get(`${email.toLowerCase()}:register`);
       if (existingOtp) {
-        otpStore.set(`${payload.personalEmail.toLowerCase()}:register`, existingOtp);
+        otpStore.set(`${universityEmail.toLowerCase()}:register`, existingOtp);
       }
     }
 
     return {
       message: "Registration initiated. Verification code sent.",
       email,
-      personalEmail: payload.personalEmail || null,
+      personalEmail,
+      universityEmail: universityEmail || null,
       devOtp: otpRes?.devOtp,
     };
   },

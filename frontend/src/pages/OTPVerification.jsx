@@ -8,7 +8,7 @@ import Icon from "../components/Icons.jsx";
 
 const PURPOSE_COPY = {
   register: {
-    title: "Verify University Email",
+    title: "Verify Email Address",
     sub: "Confirm your email address to complete registration.",
   },
   login: {
@@ -86,6 +86,7 @@ export default function OTPVerification() {
           <OTPModal
             email={effectiveAuth.email}
             personalEmail={effectiveAuth.personalEmail}
+            universityEmail={effectiveAuth.universityEmail}
             purpose={effectiveAuth.purpose}
             isDemo={effectiveAuth.isDemo}
             devOtp={effectiveAuth.devOtp}

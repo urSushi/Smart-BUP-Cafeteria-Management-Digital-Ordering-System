@@ -22,10 +22,10 @@ const ROLE_ID_FIELD = {
 };
 
 const ROLE_REQUIRED_FIELDS = {
-  student: ["fullName", "universityId", "universityEmail", "department", "phone", "password"],
-  faculty: ["fullName", "facultyId", "universityEmail", "department", "designation", "phone", "password"],
-  officer: ["fullName", "officerId", "universityEmail", "rank", "office", "phone", "password"],
-  staff: ["fullName", "staffId", "universityEmail", "department", "officeDesignation", "phone", "password"],
+  student: ["fullName", "universityId", "personalEmail", "department", "phone", "password"],
+  faculty: ["fullName", "facultyId", "personalEmail", "department", "designation", "phone", "password"],
+  officer: ["fullName", "officerId", "personalEmail", "rank", "office", "phone", "password"],
+  staff: ["fullName", "staffId", "personalEmail", "department", "officeDesignation", "phone", "password"],
 };
 
 export async function register(req, res) {
@@ -34,6 +34,11 @@ export async function register(req, res) {
   if (!["student", "faculty", "officer", "staff"].includes(role)) {
     return res.status(400).json({ message: "Unknown role. Supported roles: student, faculty, officer, staff." });
   }
+
+  const personalEmail = (req.body.personalEmail || req.body.email || "").trim();
+  const universityEmail = (req.body.universityEmail || "").trim();
+  req.body.personalEmail = personalEmail;
+  req.body.universityEmail = universityEmail;
 
   const required = ROLE_REQUIRED_FIELDS[role];
   const missing = required.filter((f) => !req.body[f] || String(req.body[f]).trim() === "");
@@ -54,8 +59,11 @@ export async function register(req, res) {
   if (findUserByIdentifier(identifier)) {
     return res.status(409).json({ message: `An account with that ${idField} already exists.` });
   }
-  if (findUserByEmail(req.body.universityEmail) || findUserByEmail(req.body.personalEmail)) {
-    return res.status(409).json({ message: "An account with that email already exists." });
+  if (personalEmail && findUserByEmail(personalEmail)) {
+    return res.status(409).json({ message: "An account with that email address already exists." });
+  }
+  if (universityEmail && findUserByEmail(universityEmail)) {
+    return res.status(409).json({ message: "An account with that official university email already exists." });
   }
 
   const passwordHash = await bcrypt.hash(password, 10);
@@ -63,8 +71,8 @@ export async function register(req, res) {
     role,
     fullName: req.body.fullName,
     identifier,
-    universityEmail: req.body.universityEmail,
-    personalEmail: req.body.personalEmail,
+    universityEmail: universityEmail || null,
+    personalEmail,
     department: req.body.department,
     program: req.body.program,
     semester: req.body.semester,
@@ -79,7 +87,7 @@ export async function register(req, res) {
     verified: false,
   });
 
-  const targetEmails = [user.universityEmail, user.personalEmail].filter(Boolean);
+  const targetEmails = [user.personalEmail, user.universityEmail].filter(Boolean);
   const code = issueOtpForUser({ universityEmail: user.universityEmail, personalEmail: user.personalEmail }, "register");
   let emailSent = false;
   try {
@@ -89,16 +97,17 @@ export async function register(req, res) {
     console.warn(`[REGISTER] Warning: Could not deliver email to ${targetEmails.join(", ")}: ${mailErr.message}`);
   }
 
-  const emailDestinations = user.personalEmail
-    ? `${user.universityEmail} and ${user.personalEmail}`
-    : user.universityEmail;
+  const emailDestinations = user.universityEmail
+    ? `${user.personalEmail} and ${user.universityEmail}`
+    : user.personalEmail;
 
   return res.status(201).json({
     message: emailSent
       ? `Account created! Verification code sent to ${emailDestinations}.`
       : `Account created and stored in database. Complete verification to activate account.`,
-    email: user.universityEmail,
+    email: user.personalEmail || user.universityEmail,
     personalEmail: user.personalEmail,
+    universityEmail: user.universityEmail,
     emailSent,
     ...(process.env.SMTP_USER ? {} : { devOtp: code }),
   });

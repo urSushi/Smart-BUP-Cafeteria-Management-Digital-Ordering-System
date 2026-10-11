@@ -124,7 +124,9 @@ export default function Signup() {
   const isValid = useMemo(() => {
     const nameOk = form.fullName.trim().length >= 2;
     const idOk = (currentId || "").trim().length >= 3;
-    const emailOk = /^\S+@\S+\.\S+$/.test(form.universityEmail || "");
+    const personalEmailOk = /^\S+@\S+\.\S+$/.test((form.personalEmail || "").trim());
+    const uniEmailOk = !form.universityEmail || /^\S+@\S+\.\S+$/.test(form.universityEmail.trim());
+    const emailOk = personalEmailOk && uniEmailOk;
     const phoneOk = (form.phone || "").trim().length >= 8;
     const deptOk = !!form.department;
     const roleDetailsOk =
@@ -142,6 +144,14 @@ export default function Signup() {
     e.preventDefault();
     setSubmitError("");
 
+    if (!form.personalEmail || !/^\S+@\S+\.\S+$/.test(form.personalEmail.trim())) {
+      setSubmitError("Please enter a valid Email Address.");
+      return;
+    }
+    if (form.universityEmail && !/^\S+@\S+\.\S+$/.test(form.universityEmail.trim())) {
+      setSubmitError("Please enter a valid Official University Email format or leave it blank.");
+      return;
+    }
     if (!form.department) {
       setSubmitError("Please select your Department / Office.");
       return;
@@ -356,7 +366,21 @@ export default function Signup() {
               </div>
 
               <div className="field" style={{ flex: 1 }}>
-                <label>Official University Email</label>
+                <label>Email Address</label>
+                <input
+                  type="email"
+                  className="input"
+                  placeholder="e.g. didar.personal@gmail.com"
+                  value={form.personalEmail}
+                  onChange={(e) => set("personalEmail", e.target.value)}
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="form-row">
+              <div className="field" style={{ flex: 1 }}>
+                <label>Official University Email (Optional)</label>
                 <input
                   type="email"
                   className="input"
@@ -371,20 +395,6 @@ export default function Signup() {
                   }
                   value={form.universityEmail}
                   onChange={(e) => set("universityEmail", e.target.value)}
-                  required
-                />
-              </div>
-            </div>
-
-            <div className="form-row">
-              <div className="field" style={{ flex: 1 }}>
-                <label>Personal Email (Optional)</label>
-                <input
-                  type="email"
-                  className="input"
-                  placeholder="e.g. didar.personal@gmail.com"
-                  value={form.personalEmail}
-                  onChange={(e) => set("personalEmail", e.target.value)}
                 />
               </div>
 

@@ -56,10 +56,11 @@ export function AuthProvider({ children }) {
       const res = await authService.register(payload);
       setAuthStage("otp_pending");
       const universityEmail = payload.universityEmail;
-      const personalEmail = payload.personalEmail;
+      const personalEmail = payload.personalEmail || payload.email;
       setPendingAuth({
-        email: universityEmail,
+        email: personalEmail || universityEmail,
         personalEmail: personalEmail || null,
+        universityEmail: universityEmail || null,
         purpose: "register",
         devOtp: res?.devOtp,
         emailSent: res?.emailSent,

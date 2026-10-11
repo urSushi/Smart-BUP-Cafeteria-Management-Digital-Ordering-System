@@ -15,6 +15,7 @@ function formatTime(totalSeconds) {
 export default function OTPModal({
   email,
   personalEmail = null,
+  universityEmail = null,
   purpose = "register",
   onVerify,
   onResend,
@@ -130,7 +131,15 @@ export default function OTPModal({
       <p className="sub" style={{ margin: "14px auto 14px", lineHeight: 1.5 }}>
         We sent a 6-digit verification code to <br />
         <strong style={{ color: "var(--ink)" }}>{email}</strong>
-        {personalEmail && (
+        {universityEmail && universityEmail.toLowerCase() !== email?.toLowerCase() && (
+          <>
+            <br />
+            <span style={{ fontSize: "0.85rem", color: "var(--ink-soft)" }}>
+              &amp; official university email: <strong style={{ color: "var(--ink)" }}>{universityEmail}</strong>
+            </span>
+          </>
+        )}
+        {personalEmail && personalEmail.toLowerCase() !== email?.toLowerCase() && (
           <>
             <br />
             <span style={{ fontSize: "0.85rem", color: "var(--ink-soft)" }}>
@@ -157,7 +166,7 @@ export default function OTPModal({
           }}
         >
           <Icon name="checkCircle" size={14} color="var(--teal)" />
-          <span>Dispatched live to {personalEmail ? "university and personal email inboxes" : "university email inbox"}</span>
+          <span>Dispatched live to {universityEmail && personalEmail ? "both email inboxes" : "email inbox"}</span>
         </div>
       ) : (
         <div

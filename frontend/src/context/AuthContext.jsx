@@ -231,6 +231,14 @@ export function AuthProvider({ children }) {
     setSession(null);
     setAuthStage("idle");
     setPendingAuth(null);
+    try {
+      localStorage.removeItem("sbcms_cart_guest");
+      Object.keys(localStorage).forEach((k) => {
+        if (k.startsWith("sbcms_cart_")) {
+          localStorage.removeItem(k);
+        }
+      });
+    } catch {}
   }
 
   const value = useMemo(

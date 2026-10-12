@@ -276,6 +276,16 @@ export default function CartDrawer({ onProceedToPayment, onRequireAuth }) {
                   disabled={isCafeteriaClosed}
                   onClick={() => {
                     if (isCafeteriaClosed) return;
+                    const current = window.location.pathname + window.location.search;
+                    if (
+                      current &&
+                      !current.startsWith("/login") &&
+                      !current.startsWith("/signup") &&
+                      !current.startsWith("/guest") &&
+                      !current.startsWith("/otp-verification")
+                    ) {
+                      sessionStorage.setItem("sbcms_auth_return", current);
+                    }
                     setIsCartOpen(false);
                     if (onRequireAuth) {
                       onRequireAuth();

@@ -51,7 +51,20 @@ export default function OTPVerification() {
         } else if (res.user?.role === "cafeteria_manager") {
           navigate("/manager/dashboard");
         } else {
-          navigate("/home");
+          const returnUrl = sessionStorage.getItem("sbcms_auth_return");
+          sessionStorage.removeItem("sbcms_auth_return");
+          if (
+            returnUrl &&
+            returnUrl !== "/login" &&
+            returnUrl !== "/signup" &&
+            returnUrl !== "/guest" &&
+            returnUrl !== "/otp-verification" &&
+            returnUrl !== "/"
+          ) {
+            navigate(returnUrl);
+          } else {
+            navigate("/home");
+          }
         }
       } else {
         toast.success("Verified successfully. You may now log in.");

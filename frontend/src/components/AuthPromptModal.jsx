@@ -73,64 +73,74 @@ export default function AuthPromptModal({ isOpen, onClose }) {
         )}
 
         {/* Options */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-          {/* 1. Student / Staff Login */}
-          <button
-            type="button"
-            className="auth-choice-card"
-            onClick={() => {
-              onClose();
-              navigate("/login");
-            }}
-          >
-            <div className="choice-icon choice-primary">
-              <Icon name="user" size={18} />
-            </div>
-            <div className="choice-info">
-              <strong>University Account Login</strong>
-              <span>For BUP Students, Faculty members, and Staff</span>
-            </div>
-            <Icon name="chevronRight" size={16} color="var(--ink-muted)" />
-          </button>
+        {(() => {
+          function handleNavigate(targetPath) {
+            const current = window.location.pathname + window.location.search;
+            if (
+              current &&
+              !current.startsWith("/login") &&
+              !current.startsWith("/signup") &&
+              !current.startsWith("/guest") &&
+              !current.startsWith("/otp-verification")
+            ) {
+              sessionStorage.setItem("sbcms_auth_return", current);
+            }
+            onClose();
+            navigate(targetPath);
+          }
 
-          {/* 2. Guest Pass */}
-          <button
-            type="button"
-            className="auth-choice-card"
-            onClick={() => {
-              onClose();
-              navigate("/guest");
-            }}
-          >
-            <div className="choice-icon choice-mustard">
-              <Icon name="shield" size={18} />
-            </div>
-            <div className="choice-info">
-              <strong>Instant 7-Day Guest Pass</strong>
-              <span>Fast access for visitors, guardians, and guests</span>
-            </div>
-            <Icon name="chevronRight" size={16} color="var(--ink-muted)" />
-          </button>
+          return (
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              {/* 1. Student / Staff Login */}
+              <button
+                type="button"
+                className="auth-choice-card"
+                onClick={() => handleNavigate("/login")}
+              >
+                <div className="choice-icon choice-primary">
+                  <Icon name="user" size={18} />
+                </div>
+                <div className="choice-info">
+                  <strong>University Account Login</strong>
+                  <span>For BUP Students, Faculty members, and Staff</span>
+                </div>
+                <Icon name="chevronRight" size={16} color="var(--ink-muted)" />
+              </button>
 
-          {/* 3. Register */}
-          <button
-            type="button"
-            className="auth-choice-card"
-            onClick={() => {
-              onClose();
-              navigate("/signup");
-            }}
-          >
-            <div className="choice-icon choice-subtle">
-              <Icon name="sparkles" size={18} />
+              {/* 2. Guest Pass */}
+              <button
+                type="button"
+                className="auth-choice-card"
+                onClick={() => handleNavigate("/guest")}
+              >
+                <div className="choice-icon choice-mustard">
+                  <Icon name="shield" size={18} />
+                </div>
+                <div className="choice-info">
+                  <strong>Instant 7-Day Guest Pass</strong>
+                  <span>Fast access for visitors, guardians, and guests</span>
+                </div>
+                <Icon name="chevronRight" size={16} color="var(--ink-muted)" />
+              </button>
+
+              {/* 3. Register */}
+              <button
+                type="button"
+                className="auth-choice-card"
+                onClick={() => handleNavigate("/signup")}
+              >
+                <div className="choice-icon choice-subtle">
+                  <Icon name="sparkles" size={18} />
+                </div>
+                <div className="choice-info">
+                  <strong>Register New Student / Staff Account</strong>
+                  <span>Requires verified @bup.edu.bd university email</span>
+                </div>
+                <Icon name="chevronRight" size={16} color="var(--ink-muted)" />
+              </button>
             </div>
-            <div className="choice-info">
-              <strong>Register New Student / Staff Account</strong>
-              <span>Requires verified @bup.edu.bd university email</span>
-            </div>
-            <Icon name="chevronRight" size={16} color="var(--ink-muted)" />
-          </button>
-        </div>
+          );
+        })()}
 
         {/* Cancel button */}
         <div style={{ marginTop: 18, textAlign: "center" }}>

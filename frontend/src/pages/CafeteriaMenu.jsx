@@ -8,12 +8,7 @@ import { CAFETERIAS } from "../data/cafeterias.js";
 import { fetchLiveCafeterias, subscribeSync } from "../utils/liveCafeterias.js";
 import { useCart } from "../context/CartContext.jsx";
 import { useAuth } from "../context/AuthContext.jsx";
-import CartDrawer from "../components/CartDrawer.jsx";
-import PaymentModal from "../components/PaymentModal.jsx";
-import OrderConfirmationModal from "../components/OrderConfirmationModal.jsx";
-import OrderTrackingModal from "../components/OrderTrackingModal.jsx";
 import ReviewModal from "../components/ReviewModal.jsx";
-import AuthPromptModal from "../components/AuthPromptModal.jsx";
 
 export default function CafeteriaMenu() {
   const { id } = useParams();
@@ -27,11 +22,7 @@ export default function CafeteriaMenu() {
   const [searchQuery, setSearchQuery] = useState("");
   const [tagFilter, setTagFilter] = useState("all");
 
-  // Modals state
-  const [paymentOpen, setPaymentOpen] = useState(false);
-  const [authPromptOpen, setAuthPromptOpen] = useState(false);
-  const [confirmOrder, setConfirmOrder] = useState(null);
-  const [trackingOrder, setTrackingOrder] = useState(null);
+  // Review modal state (for "Rate Cafeteria" button)
   const [reviewOrder, setReviewOrder] = useState(null);
   const [isReviewAutoPopup, setIsReviewAutoPopup] = useState(false);
 
@@ -239,10 +230,18 @@ export default function CafeteriaMenu() {
                 </span>
               </div>
               <div className="guest-menu-banner-actions">
-                <Link to="/login" className="btn btn-primary btn-sm">
+                <Link
+                  to="/login"
+                  className="btn btn-primary btn-sm"
+                  onClick={() => sessionStorage.setItem("sbcms_auth_return", `/cafeteria/${cafeteria.id}`)}
+                >
                   Log In to Order
                 </Link>
-                <Link to="/guest" className="btn btn-mustard btn-sm">
+                <Link
+                  to="/guest"
+                  className="btn btn-mustard btn-sm"
+                  onClick={() => sessionStorage.setItem("sbcms_auth_return", `/cafeteria/${cafeteria.id}`)}
+                >
                   7-Day Guest Pass
                 </Link>
               </div>
@@ -408,66 +407,7 @@ export default function CafeteriaMenu() {
         )}
       </main>
 
-      {/* Modals */}
-      <CartDrawer
-        onProceedToPayment={() => {
-          if (!authenticated) {
-            setAuthPromptOpen(true);
-          } else {
-            setPaymentOpen(true);
-          }
-        }}
-        onRequireAuth={() => setAuthPromptOpen(true)}
-      />
-
-      <AuthPromptModal
-        isOpen={authPromptOpen}
-        onClose={() => setAuthPromptOpen(false)}
-      />
-
-      <PaymentModal
-        isOpen={paymentOpen}
-        onClose={() => setPaymentOpen(false)}
-        onOrderConfirmed={(order) => setConfirmOrder(order)}
-      />
-
-      <OrderConfirmationModal
-        isOpen={Boolean(confirmOrder)}
-        order={confirmOrder}
-        onClose={(skipAutoPopup) => {
-          const ord = confirmOrder;
-          setConfirmOrder(null);
-          if (!skipAutoPopup && ord && ord.id) {
-            try {
-              const dismissed = JSON.parse(localStorage.getItem("sbcms_dismissed_reviews") || "[]");
-              const reviewed = JSON.parse(localStorage.getItem("sbcms_reviewed_orders") || "[]");
-              if (!dismissed.includes(ord.id) && !reviewed.includes(ord.id)) {
-                // Show popup for review after ordering & payment done!
-                setIsReviewAutoPopup(true);
-                setReviewOrder(ord);
-              }
-            } catch {}
-          }
-        }}
-        onTrackOrder={(order) => setTrackingOrder(order)}
-        onOpenReview={(order) => {
-          setConfirmOrder(null);
-          setIsReviewAutoPopup(true);
-          setReviewOrder(order);
-        }}
-      />
-
-      <OrderTrackingModal
-        isOpen={Boolean(trackingOrder)}
-        order={trackingOrder}
-        onClose={() => setTrackingOrder(null)}
-        onOpenReview={(order) => {
-          setTrackingOrder(null);
-          setIsReviewAutoPopup(false);
-          setReviewOrder(order);
-        }}
-      />
-
+      {/* Review Modal for Header 'Rate Cafeteria' action */}
       <ReviewModal
         isOpen={Boolean(reviewOrder)}
         order={reviewOrder?.items ? reviewOrder : null}

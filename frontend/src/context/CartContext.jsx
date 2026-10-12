@@ -26,22 +26,97 @@ export function CartProvider({ children }) {
   const [cartState, setCartState] = useState(() => loadCartForUser(user));
   const [isCartOpen, setIsCartOpen] = useState(false);
   const toast = useToast();
-  const prevUserKeyRef = useRef(getCartStorageKey(user));
 
-  // Cleanly swap cart when switching accounts (e.g., student logs out, faculty logs in)
+  const prevUserRef = useRef(user);
+  const activeKeyRef = useRef(getCartStorageKey(user));
+
+  // User lifecycle: migrate guest cart on login, wipe cart on logout or account switch
   useEffect(() => {
+    const prevUser = prevUserRef.current;
+    const prevKey = getCartStorageKey(prevUser);
     const currentKey = getCartStorageKey(user);
-    if (prevUserKeyRef.current !== currentKey) {
-      prevUserKeyRef.current = currentKey;
-      setCartState(loadCartForUser(user));
+
+    if (prevKey !== currentKey) {
+      prevUserRef.current = user;
+
+      // 1. Guest -> Logged in user: Migrate guest cart items and show cart drawer
+      if (!prevUser && user) {
+        let guestCart = null;
+        try {
+          const raw = localStorage.getItem("sbcms_cart_guest");
+          if (raw) guestCart = JSON.parse(raw);
+        } catch {}
+
+        // Fallback to in-memory cartState if localStorage was empty or already loaded
+        if (!guestCart || !guestCart.items || guestCart.items.length === 0) {
+          if (cartState && cartState.items && cartState.items.length > 0) {
+            guestCart = cartState;
+          }
+        }
+
+        if (guestCart && guestCart.items && guestCart.items.length > 0) {
+          try {
+            localStorage.setItem(currentKey, JSON.stringify(guestCart));
+            localStorage.removeItem("sbcms_cart_guest");
+          } catch {}
+          activeKeyRef.current = currentKey;
+          setCartState(guestCart);
+          // Make sure cart drawer opens visibly upon login
+          setIsCartOpen(true);
+          toast.info("Your cart items are ready for checkout!");
+          return;
+        } else {
+          activeKeyRef.current = currentKey;
+          setCartState(loadCartForUser(user));
+          return;
+        }
+      }
+
+      // 2. Logged in user -> Logged out: Wipe cart completely and close drawer
+      if (prevUser && !user) {
+        const emptyCart = { items: [], cafeteriaId: null, promo: null };
+        try {
+          localStorage.removeItem(prevKey);
+          localStorage.removeItem("sbcms_cart_guest");
+          Object.keys(localStorage).forEach((k) => {
+            if (k.startsWith("sbcms_cart_")) localStorage.removeItem(k);
+          });
+        } catch {}
+        activeKeyRef.current = currentKey;
+        setCartState(emptyCart);
+        setIsCartOpen(false);
+        return;
+      }
+
+      // 3. User A -> User B (Account switch): Wipe cart completely and close drawer
+      if (prevUser && user && prevKey !== currentKey) {
+        const emptyCart = { items: [], cafeteriaId: null, promo: null };
+        try {
+          localStorage.removeItem(prevKey);
+          localStorage.removeItem(currentKey);
+          localStorage.removeItem("sbcms_cart_guest");
+        } catch {}
+        activeKeyRef.current = currentKey;
+        setCartState(emptyCart);
+        setIsCartOpen(false);
+        return;
+      }
+
+      activeKeyRef.current = currentKey;
     }
   }, [user]);
 
   // Persist cart to user's isolated storage key
   useEffect(() => {
+    const currentKey = getCartStorageKey(user);
+    if (activeKeyRef.current !== currentKey) return;
+
     try {
-      const key = getCartStorageKey(user);
-      localStorage.setItem(key, JSON.stringify(cartState));
+      if (!cartState.items || cartState.items.length === 0) {
+        localStorage.removeItem(currentKey);
+      } else {
+        localStorage.setItem(currentKey, JSON.stringify(cartState));
+      }
     } catch {}
   }, [cartState, user]);
 
@@ -171,6 +246,11 @@ export function CartProvider({ children }) {
   }
 
   function clearCart() {
+    try {
+      const key = getCartStorageKey(user);
+      localStorage.removeItem(key);
+      localStorage.removeItem("sbcms_cart_guest");
+    } catch {}
     setCartState({ items: [], cafeteriaId: null, promo: null });
   }
 

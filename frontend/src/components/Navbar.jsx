@@ -144,6 +144,20 @@ export default function Navbar() {
     }
   };
 
+  const handleAuthLinkClick = () => {
+    setOpen(false);
+    const current = window.location.pathname + window.location.search;
+    if (
+      current &&
+      !current.startsWith("/login") &&
+      !current.startsWith("/signup") &&
+      !current.startsWith("/guest") &&
+      !current.startsWith("/otp-verification")
+    ) {
+      sessionStorage.setItem("sbcms_auth_return", current);
+    }
+  };
+
   function handleLogout() {
     logout();
     setUserDropdown(false);
@@ -448,14 +462,14 @@ export default function Navbar() {
               </div>
             ) : (
               <>
-                <Link to="/login" className="btn btn-ghost">
+                <Link to="/login" className="btn btn-ghost" onClick={handleAuthLinkClick}>
                   <Icon name="user" size={15} />
                   <span>Login</span>
                 </Link>
-                <Link to="/signup" className="btn btn-secondary">
+                <Link to="/signup" className="btn btn-secondary" onClick={handleAuthLinkClick}>
                   Sign Up
                 </Link>
-                <Link to="/guest" className="btn btn-mustard">
+                <Link to="/guest" className="btn btn-mustard" onClick={handleAuthLinkClick}>
                   <Icon name="shield" size={14} />
                   <span>Guest Pass</span>
                 </Link>
@@ -618,7 +632,7 @@ export default function Navbar() {
                   to="/login"
                   className="btn btn-ghost"
                   style={{ width: "100%", justifyContent: "center" }}
-                  onClick={() => setOpen(false)}
+                  onClick={handleAuthLinkClick}
                 >
                   <Icon name="user" size={15} />
                   <span>Login</span>
@@ -627,7 +641,7 @@ export default function Navbar() {
                   to="/signup"
                   className="btn btn-secondary"
                   style={{ width: "100%", justifyContent: "center" }}
-                  onClick={() => setOpen(false)}
+                  onClick={handleAuthLinkClick}
                 >
                   Sign Up
                 </Link>
@@ -635,7 +649,7 @@ export default function Navbar() {
                   to="/guest"
                   className="btn btn-mustard"
                   style={{ width: "100%", justifyContent: "center" }}
-                  onClick={() => setOpen(false)}
+                  onClick={handleAuthLinkClick}
                 >
                   <Icon name="shield" size={14} />
                   <span>Guest Pass</span>

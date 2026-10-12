@@ -2343,7 +2343,10 @@ select.input option[value=""] {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 20px;
+  padding: 24px 16px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
   animation: fadeIn 0.2s ease;
 }
 @keyframes fadeIn {
@@ -2354,13 +2357,37 @@ select.input option[value=""] {
 .modal-card {
   width: 100%;
   max-width: 600px;
+  max-height: calc(100vh - 48px);
+  max-height: calc(100dvh - 48px);
+  margin: auto;
   background: var(--paper-raised);
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-raised);
   padding: 26px;
   position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: var(--sand-line) transparent;
   animation: scaleIn 0.28s cubic-bezier(0.16, 1, 0.3, 1);
   will-change: transform, opacity;
+}
+.modal-card::-webkit-scrollbar {
+  width: 6px;
+}
+.modal-card::-webkit-scrollbar-track {
+  background: transparent;
+}
+.modal-card::-webkit-scrollbar-thumb {
+  background: var(--sand-line);
+  border-radius: 999px;
+}
+.modal-card::-webkit-scrollbar-thumb:hover {
+  background: var(--teal);
 }
 @keyframes scaleIn {
   from { transform: scale(0.93) translateY(12px); opacity: 0; }
@@ -2506,6 +2533,22 @@ select.input option[value=""] {
 @media (max-width: 600px) {
   .popular-items-grid { grid-template-columns: 1fr; }
   .detail-meta-grid { grid-template-columns: 1fr; }
+  .modal-backdrop {
+    padding: 14px 10px;
+  }
+  .modal-card {
+    padding: 20px 16px;
+    max-height: calc(100vh - 28px);
+    max-height: calc(100dvh - 28px);
+    border-radius: var(--radius-lg);
+  }
+  .payment-modal {
+    max-height: calc(100vh - 28px);
+    max-height: calc(100dvh - 28px);
+  }
+  .payment-modal-header {
+    top: -20px;
+  }
 }
 .popular-item-card {
   background: var(--paper);
@@ -3079,6 +3122,15 @@ select.input option[value=""] {
 /* Payment Modal */
 .payment-modal {
   max-width: 520px;
+  max-height: calc(100vh - 48px);
+  max-height: calc(100dvh - 48px);
+  margin: auto;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  display: flex;
+  flex-direction: column;
 }
 .payment-modal-header {
   display: flex;
@@ -3086,12 +3138,23 @@ select.input option[value=""] {
   align-items: flex-start;
   padding-bottom: 14px;
   border-bottom: 1px solid var(--sand-line);
+  position: sticky;
+  top: -26px;
+  background: var(--paper-raised);
+  z-index: 15;
+  padding-top: 4px;
+  margin-top: -4px;
+}
+[data-theme="dark"] .payment-modal-header {
+  background: #111827;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 .payment-method-tabs {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 8px;
   margin: 18px 0;
+  flex-shrink: 0;
 }
 @media (max-width: 520px) {
   .payment-method-tabs {
@@ -4582,9 +4645,11 @@ select.input option[value=""] {
 }
 .payment-footer-actions {
   margin-top: 24px;
+  padding-bottom: 6px;
   display: flex;
   flex-direction: column;
   gap: 10px;
+  flex-shrink: 0;
 }
 
 /* 9. Orders Page Header & Card Alignments */

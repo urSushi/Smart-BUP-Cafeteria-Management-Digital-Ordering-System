@@ -275,25 +275,25 @@ export default function Landing() {
       {/* Student & Faculty Testimonials */}
       <section className="section" style={{ background: "var(--teal-tint)" }}>
         <div className="container">
-          <div className="section-head" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: 16 }}>
-            <div>
-              <span className="section-eyebrow">
-                <Icon name="heart" size={14} />
-                <span>Campus Buzz</span>
-              </span>
-              <h2>Loved by Students & Faculty Across Campus</h2>
-              <p>Here is what the university community has to say about their dining experience.</p>
-            </div>
+          <div className="section-head">
+            <span className="section-eyebrow">
+              <Icon name="heart" size={14} />
+              <span>Campus Buzz</span>
+            </span>
+            <h2>Loved by Students & Faculty Across Campus</h2>
+            <p>Here is what the university community has to say about their dining experience.</p>
 
-            <button
-              type="button"
-              className="btn btn-mustard"
-              onClick={() => setReviewOpen(true)}
-              style={{ display: "inline-flex", alignItems: "center", gap: 8, whiteSpace: "nowrap" }}
-            >
-              <Icon name="star" size={16} />
-              <span>Drop a Review</span>
-            </button>
+            <div style={{ marginTop: 20, display: "flex", justifyContent: "center" }}>
+              <button
+                type="button"
+                className="btn btn-mustard"
+                onClick={() => setReviewOpen(true)}
+                style={{ display: "inline-flex", alignItems: "center", gap: 8, whiteSpace: "nowrap" }}
+              >
+                <Icon name="star" size={16} />
+                <span>Drop a Review</span>
+              </button>
+            </div>
           </div>
 
           <div className="testimonials-grid">

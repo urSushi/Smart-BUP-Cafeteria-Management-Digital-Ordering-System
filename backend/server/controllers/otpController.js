@@ -1,6 +1,6 @@
 import { issueOtp, verifyOtpCode } from "../models/OTP.js";
 import { sendOTP } from "../utils/sendOTP.js";
-import { findUserByEmail, toPublicUser, updateUserById } from "../models/User.js";
+import { findUserByEmail, findUserByIdentifier, toPublicUser, updateUserById } from "../models/User.js";
 import { findGuestByEmail, activateGuest, toPublicGuest } from "../models/Guest.js";
 import { generateToken } from "../utils/generateToken.js";
 
@@ -13,9 +13,9 @@ export async function sendOtp(req, res) {
   }
 
   if (purpose === "login") {
-    const user = findUserByEmail(email);
+    const user = findUserByEmail(email) || findUserByIdentifier(email);
     if (!user || !user.verified) {
-      return res.status(404).json({ message: "No verified account found for that email." });
+      return res.status(404).json({ message: "No verified account found for that email or ID." });
     }
   } else if (purpose === "register") {
     const user = findUserByEmail(email);
@@ -69,7 +69,7 @@ export async function verifyOtp(req, res) {
   }
 
   if (purpose === "login") {
-    const user = findUserByEmail(email);
+    const user = findUserByEmail(email) || findUserByIdentifier(email);
     if (!user) return res.status(404).json({ message: "Account not found." });
     const token = generateToken(user);
     return res.json({ message: "Verified.", token, user: toPublicUser(user) });

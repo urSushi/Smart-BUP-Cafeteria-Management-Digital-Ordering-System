@@ -157,15 +157,15 @@ export default function Navbar() {
     setUserDropdown(false);
     try {
       if (targetRole === "student") {
-        await login("2021-1-60-001", "password123");
+        await login("2021-1-60-001", "password123", { direct: true });
         toast.success("Switched to Student Demo account (Sarah Rahman).");
         navigate("/home");
       } else if (targetRole === "faculty") {
-        await login("FAC-101", "password123");
+        await login("FAC-101", "password123", { direct: true });
         toast.success("Switched to Faculty Demo account (Dr. Tanvir Ahmed).");
         navigate("/home");
       } else if (targetRole === "officer") {
-        await login("OFF-301", "password123");
+        await login("OFF-301", "password123", { direct: true });
         toast.success("Switched to Officer Demo account (Mohammad Rafiqul Islam).");
         navigate("/home");
       } else if (targetRole === "staff") {

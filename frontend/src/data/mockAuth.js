@@ -424,17 +424,44 @@ export const mockAuth = {
     await sleep(350);
     const cleanEmail = String(email || "").trim().toLowerCase();
     const isDemo =
-      ["student@bup.edu.bd", "faculty@bup.edu.bd", "officer@bup.edu.bd", "staff@bup.edu.bd", "guest@bup.edu.bd", "admin@bup.edu.bd"].includes(cleanEmail) ||
+      [
+        "student@bup.edu.bd",
+        "faculty@bup.edu.bd",
+        "officer@bup.edu.bd",
+        "staff@bup.edu.bd",
+        "guest@bup.edu.bd",
+        "admin@bup.edu.bd",
+        "2021-1-60-001",
+        "fac-101",
+        "off-301",
+        "stf-001",
+        "gst-8890",
+        "adm-001",
+      ].includes(cleanEmail) ||
       cleanEmail.includes("demo");
     const code = isDemo ? "123456" : String(Math.floor(100000 + Math.random() * 900000));
     latestOtpCode = code;
-    otpStore.set(`${cleanEmail}:${purpose}`, {
+    const entry = {
       code,
       email: cleanEmail,
       purpose,
       isDemo,
       expiresAt: Date.now() + 5 * 60 * 1000,
-    });
+    };
+    otpStore.set(`${cleanEmail}:${purpose}`, entry);
+
+    // Link OTP to user's registered emails and identifier
+    const linkedUser = mockUsers.find(
+      (u) =>
+        u.personalEmail?.toLowerCase() === cleanEmail ||
+        u.universityEmail?.toLowerCase() === cleanEmail ||
+        u.identifier?.toLowerCase() === cleanEmail
+    );
+    if (linkedUser) {
+      if (linkedUser.personalEmail) otpStore.set(`${linkedUser.personalEmail.toLowerCase()}:${purpose}`, entry);
+      if (linkedUser.universityEmail) otpStore.set(`${linkedUser.universityEmail.toLowerCase()}:${purpose}`, entry);
+      if (linkedUser.identifier) otpStore.set(`${linkedUser.identifier.toLowerCase()}:${purpose}`, entry);
+    }
 
     console.info(`[SBCMS Auth] Dispatched 6-digit OTP for ${cleanEmail}: ${code}`);
 
@@ -452,7 +479,20 @@ export const mockAuth = {
     const cleanOtp = String(otp).trim();
     const isDemo =
       purpose === "login" &&
-      (["student@bup.edu.bd", "faculty@bup.edu.bd", "officer@bup.edu.bd", "staff@bup.edu.bd", "guest@bup.edu.bd", "admin@bup.edu.bd"].includes(cleanEmail) ||
+      ([
+        "student@bup.edu.bd",
+        "faculty@bup.edu.bd",
+        "officer@bup.edu.bd",
+        "staff@bup.edu.bd",
+        "guest@bup.edu.bd",
+        "admin@bup.edu.bd",
+        "2021-1-60-001",
+        "fac-101",
+        "off-301",
+        "stf-001",
+        "gst-8890",
+        "adm-001",
+      ].includes(cleanEmail) ||
         cleanEmail.includes("demo"));
     const record = otpStore.get(`${cleanEmail}:${purpose}`);
 
@@ -463,7 +503,7 @@ export const mockAuth = {
     }
 
     if (purpose === "guest") {
-      const guest = mockGuests.find((g) => g.personalEmail?.toLowerCase() === email.toLowerCase());
+      const guest = mockGuests.find((g) => g.personalEmail?.toLowerCase() === cleanEmail || g.guestCode?.toLowerCase() === cleanEmail);
       if (guest) {
         guest.verified = true;
         guest.status = "active";
@@ -477,6 +517,7 @@ export const mockAuth = {
             role: "guest",
             fullName: guest.fullName,
             personalEmail: guest.personalEmail,
+            guestCode: guest.guestCode,
             expiresAt: guest.expiresAt,
             isGuest: true,
           },
@@ -487,8 +528,10 @@ export const mockAuth = {
     // Check registered user or email login
     const user = mockUsers.find(
       (u) =>
-        u.universityEmail?.toLowerCase() === email.toLowerCase() ||
-        u.personalEmail?.toLowerCase() === email.toLowerCase()
+        u.universityEmail?.toLowerCase() === cleanEmail ||
+        u.personalEmail?.toLowerCase() === cleanEmail ||
+        u.identifier?.toLowerCase() === cleanEmail ||
+        u.guestCode?.toLowerCase() === cleanEmail
     );
 
     if (user) {
@@ -503,9 +546,16 @@ export const mockAuth = {
           fullName: user.fullName,
           identifier: user.identifier,
           universityEmail: user.universityEmail,
+          personalEmail: user.personalEmail,
           department: user.department,
           program: user.program,
           semester: user.semester,
+          batch: user.batch,
+          designation: user.designation,
+          rank: user.rank,
+          office: user.office,
+          section: user.section,
+          guestCode: user.guestCode,
         },
       };
     }

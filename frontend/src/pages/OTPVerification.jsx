@@ -42,9 +42,17 @@ export default function OTPVerification() {
     setError("");
     try {
       const res = await verifyOtp(otp);
-      if (res.token) {
+      if (res.token || res.user) {
         toast.success("Identity verified! Welcome to Smart Cafeteria.");
-        navigate("/home");
+        if (res.user?.role === "admin") {
+          navigate("/admin/dashboard");
+        } else if (res.user?.role === "cafeteria_staff") {
+          navigate("/staff/dashboard");
+        } else if (res.user?.role === "cafeteria_manager") {
+          navigate("/manager/dashboard");
+        } else {
+          navigate("/home");
+        }
       } else {
         toast.success("Verified successfully. You may now log in.");
         navigate("/login");

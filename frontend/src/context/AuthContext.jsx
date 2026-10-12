@@ -92,7 +92,58 @@ export function AuthProvider({ children }) {
     }
   }
 
-  async function login(universityId, password) {
+  async function initiateLogin(identifier, password) {
+    setLoading(true);
+    try {
+      const cleanId = String(identifier || "").trim();
+      const res = await authService.login(cleanId, password);
+      const user = res.user;
+
+      const primaryEmail = user?.personalEmail || user?.universityEmail || cleanId;
+      const isDemo =
+        DEMO_EMAILS.includes(String(primaryEmail).toLowerCase()) ||
+        DEMO_EMAILS.includes(String(user?.personalEmail || "").toLowerCase()) ||
+        DEMO_EMAILS.includes(String(user?.universityEmail || "").toLowerCase()) ||
+        ["2021-1-60-001", "fac-101", "off-301", "stf-001", "gst-8890", "adm-001"].includes(
+          String(user?.identifier || cleanId).toLowerCase()
+        );
+
+      let otpRes = null;
+      try {
+        otpRes = await authService.sendOtp(primaryEmail, "login");
+      } catch (otpErr) {
+        console.warn("[AuthContext] OTP send notice:", otpErr);
+      }
+
+      setAuthStage("otp_pending");
+      setPendingAuth({
+        identifier: user?.identifier || cleanId,
+        email: primaryEmail,
+        personalEmail: user?.personalEmail || null,
+        universityEmail: user?.universityEmail || null,
+        purpose: "login",
+        tempSession: res,
+        devOtp: otpRes?.devOtp || (isDemo ? "123456" : null),
+        emailSent: otpRes?.emailSent || false,
+        isDemo,
+      });
+
+      return {
+        ok: true,
+        user,
+        email: primaryEmail,
+        devOtp: otpRes?.devOtp || (isDemo ? "123456" : null),
+        isDemo,
+      };
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function login(universityId, password, options = {}) {
+    if (!options.direct) {
+      return initiateLogin(universityId, password);
+    }
     setLoading(true);
     try {
       const res = await authService.login(universityId, password);
@@ -137,6 +188,8 @@ export function AuthProvider({ children }) {
       setAuthStage("verified");
       if (res.token) {
         applySession(res);
+      } else if (pendingAuth.tempSession) {
+        applySession(pendingAuth.tempSession);
       }
       return res;
     } finally {
@@ -192,6 +245,7 @@ export function AuthProvider({ children }) {
       register,
       guestRegister,
       login,
+      initiateLogin,
       requestLoginOtp,
       sendOtp,
       verifyOtp,

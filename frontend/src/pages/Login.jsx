@@ -8,81 +8,75 @@ import Icon from "../components/Icons.jsx";
 import { mockAuth } from "../data/mockAuth.js";
 
 export default function Login() {
-  const [method, setMethod] = useState("id"); // "id" | "otp"
+  const [method, setMethod] = useState("id"); // "id" | "email"
   const [universityId, setUniversityId] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
-  const { login, requestLoginOtp, loading } = useAuth();
+  const { initiateLogin, loading } = useAuth();
   const toast = useToast();
   const navigate = useNavigate();
 
-  const idValid = universityId.trim().length >= 4 && password.length >= 6;
-  const emailValid = /^\S+@\S+\.\S+$/.test(email);
+  const idValid = universityId.trim().length >= 3 && password.length >= 6;
+  const emailValid = /^\S+@\S+\.\S+$/.test(email.trim()) && password.length >= 6;
+  const formValid = method === "id" ? idValid : emailValid;
 
   // Quick fill helper for all ER diagram user roles & entities
   function handleFillDemo(type) {
     setError("");
     const demos = mockAuth.getDemoCredentials();
     if (type === "student") {
-      setMethod("id");
       setUniversityId(demos.student.id);
+      setEmail(demos.student.email);
       setPassword(demos.student.password);
       toast.info("Filled with Student Demo credentials (CSE, Batch 2021).");
     } else if (type === "faculty") {
-      setMethod("id");
       setUniversityId(demos.faculty.id);
+      setEmail(demos.faculty.email);
       setPassword(demos.faculty.password);
       toast.info("Filled with Faculty Demo credentials (BBA, Asst. Prof).");
     } else if (type === "officer") {
-      setMethod("id");
       setUniversityId(demos.officer.id);
+      setEmail(demos.officer.email);
       setPassword(demos.officer.password);
       toast.info("Filled with Officer Demo credentials (Registrar Office).");
     } else if (type === "staff") {
-      setMethod("id");
       setUniversityId(demos.staff.id);
+      setEmail(demos.staff.email);
       setPassword(demos.staff.password);
       toast.info("Filled with University Staff Demo credentials.");
     } else if (type === "guest") {
-      setMethod("id");
       setUniversityId(demos.guest.id);
+      setEmail(demos.guest.email);
       setPassword(demos.guest.password);
       toast.info("Filled with Guest Code credentials (7-day Dining Pass).");
     } else if (type === "admin") {
-      setMethod("id");
       setUniversityId(demos.portalAdmin.id);
+      setEmail("admin@bup.edu.bd");
       setPassword(demos.portalAdmin.password);
       toast.info("Filled with System Administrator credentials.");
-    } else if (type === "otp") {
-      setMethod("otp");
-      setEmail("student@bup.edu.bd");
-      toast.info("Filled with Student Email for OTP test.");
     }
   }
 
-  async function handleIdLogin(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
     setError("");
-    try {
-      await login(universityId.trim(), password);
-      toast.success("Welcome back to Smart Cafeteria!");
-      navigate("/home");
-    } catch (err) {
-      setError(err.message || "Failed to log in. Please check credentials.");
+    const identifier = method === "id" ? universityId.trim() : email.trim();
+    if (!identifier) {
+      setError(method === "id" ? "Please enter your University ID / Employee ID." : "Please enter your registered email address.");
+      return;
     }
-  }
-
-  async function handleOtpRequest(e) {
-    e.preventDefault();
-    setError("");
+    if (!password) {
+      setError("Please enter your password.");
+      return;
+    }
     try {
-      await requestLoginOtp(email.trim());
-      toast.info("Verification code sent! (Use demo code 123456)");
+      const res = await initiateLogin(identifier, password);
+      toast.info(res.isDemo ? "Password verified! Demo 6-digit OTP dispatched (123456)." : "Password verified! 6-digit OTP sent to your registered email.");
       navigate("/otp-verification");
     } catch (err) {
-      setError(err.message || "Failed to send code.");
+      setError(err.message || "Failed to log in. Please check your credentials.");
     }
   }
 
@@ -162,14 +156,6 @@ export default function Login() {
                 <Icon name="settings" size={13} />
                 <span>Sys Admin</span>
               </button>
-              <button
-                type="button"
-                className="demo-fill-btn"
-                onClick={() => handleFillDemo("otp")}
-              >
-                <Icon name="mail" size={13} />
-                <span>OTP</span>
-              </button>
             </div>
           </div>
 
@@ -189,27 +175,27 @@ export default function Login() {
             </button>
             <button
               type="button"
-              className={method === "otp" ? "active" : ""}
+              className={method === "email" ? "active" : ""}
               onClick={() => {
-                setMethod("otp");
+                setMethod("email");
                 setError("");
               }}
             >
               <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
                 <Icon name="mail" size={14} />
-                <span>Email OTP</span>
+                <span>Registered Email</span>
               </span>
             </button>
           </div>
 
-          {method === "id" ? (
-            <form onSubmit={handleIdLogin}>
+          <form onSubmit={handleSubmit}>
+            {method === "id" ? (
               <div className="field">
                 <label htmlFor="universityId">University ID / Employee ID</label>
                 <div className="input-wrap">
                   <input
                     id="universityId"
-                    className="input"
+                    className={`input ${error && !password ? "has-error" : ""}`}
                     value={universityId}
                     onChange={(e) => setUniversityId(e.target.value)}
                     placeholder="e.g. 2021-1-60-001 or FAC-101"
@@ -217,96 +203,108 @@ export default function Login() {
                     required
                   />
                 </div>
-                <p className="field-hint">Your assigned campus student or employee ID.</p>
+                <p className="field-hint">Your assigned campus student, faculty, officer, or staff ID.</p>
               </div>
-
-              <div className="field">
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
-                  <label htmlFor="password" style={{ margin: 0 }}>Password</label>
-                  <button
-                    type="button"
-                    className="field-action-link"
-                    onClick={() => {
-                      setMethod("otp");
-                      toast.info("Enter your registered email to log in with an OTP.");
-                    }}
-                  >
-                    Forgot Password?
-                  </button>
-                </div>
-
-                <div className="input-wrap">
-                  <input
-                    id="password"
-                    type={showPassword ? "text" : "password"}
-                    className={`input ${error ? "has-error" : ""}`}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Enter your password"
-                    autoComplete="current-password"
-                    required
-                  />
-                  <button
-                    type="button"
-                    className="input-toggle"
-                    onClick={() => setShowPassword((s) => !s)}
-                    aria-label={showPassword ? "Hide password" : "Show password"}
-                  >
-                    <Icon name={showPassword ? "eyeOff" : "eye"} size={17} />
-                  </button>
-                </div>
-                {error && (
-                  <p className="field-error">
-                    <Icon name="alertCircle" size={14} />
-                    <span>{error}</span>
-                  </p>
-                )}
-              </div>
-
-              <button
-                type="submit"
-                className="btn btn-primary btn-block btn-lg"
-                disabled={!idValid || loading}
-              >
-                {loading ? <Spinner /> : "Log In to Account"}
-              </button>
-            </form>
-          ) : (
-            <form onSubmit={handleOtpRequest}>
+            ) : (
               <div className="field">
                 <label htmlFor="email">Registered University / Personal Email</label>
                 <div className="input-wrap">
                   <input
                     id="email"
                     type="email"
-                    className={`input ${error ? "has-error" : ""}`}
+                    className={`input ${error && !password ? "has-error" : ""}`}
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="you@bup.edu.bd"
+                    placeholder="e.g. student@bup.edu.bd or personal@gmail.com"
                     autoComplete="email"
                     required
                   />
                 </div>
-                <p className="field-hint">
-                  We will send a 6-digit code to this address for passwordless entry.
-                </p>
-                {error && (
-                  <p className="field-error">
-                    <Icon name="alertCircle" size={14} />
-                    <span>{error}</span>
-                  </p>
-                )}
+                <p className="field-hint">The personal or official university email registered to your account.</p>
+              </div>
+            )}
+
+            <div className="field">
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+                <label htmlFor="password" style={{ margin: 0 }}>Password</label>
+                <button
+                  type="button"
+                  className="field-action-link"
+                  onClick={() => {
+                    toast.info("To reset your password, please contact the campus administrator at admin@bup.edu.bd.");
+                  }}
+                >
+                  Forgot Password?
+                </button>
               </div>
 
-              <button
-                type="submit"
-                className="btn btn-primary btn-block btn-lg"
-                disabled={!emailValid || loading}
-              >
-                {loading ? <Spinner /> : "Send Verification Code"}
-              </button>
-            </form>
-          )}
+              <div className="input-wrap">
+                <input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  className={`input ${error ? "has-error" : ""}`}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Enter your password"
+                  autoComplete="current-password"
+                  required
+                />
+                <button
+                  type="button"
+                  className="input-toggle"
+                  onClick={() => setShowPassword((s) => !s)}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  <Icon name={showPassword ? "eyeOff" : "eye"} size={17} />
+                </button>
+              </div>
+              {error && (
+                <p className="field-error">
+                  <Icon name="alertCircle" size={14} />
+                  <span>{error}</span>
+                </p>
+              )}
+            </div>
+
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+                padding: "10px 14px",
+                borderRadius: 10,
+                background: "var(--teal-tint)",
+                border: "1px solid rgba(15, 118, 110, 0.2)",
+                marginBottom: 18,
+                fontSize: "0.82rem",
+                color: "var(--teal)",
+                lineHeight: 1.45,
+              }}
+            >
+              <Icon name="shield" size={18} color="var(--teal)" style={{ flexShrink: 0 }} />
+              <span>
+                <strong>Mandatory 2FA Verification:</strong> A 6-digit OTP will be dispatched to your registered email upon password verification.
+              </span>
+            </div>
+
+            <button
+              type="submit"
+              className="btn btn-primary btn-block btn-lg"
+              disabled={!formValid || loading}
+            >
+              {loading ? (
+                <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
+                  <Spinner />
+                  <span>Verifying Credentials...</span>
+                </span>
+              ) : (
+                <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
+                  <span>Verify Password &amp; Get OTP</span>
+                  <Icon name="arrowRight" size={16} />
+                </span>
+              )}
+            </button>
+          </form>
 
           <div className="auth-separator">
             <span>or explore other options</span>

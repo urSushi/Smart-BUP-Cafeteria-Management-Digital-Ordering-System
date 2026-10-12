@@ -171,6 +171,28 @@ export default function CafeteriaMenu() {
                     <strong>{cafeteria.rating}</strong>
                     <span>({cafeteria.reviewsCount} reviews)</span>
                   </div>
+
+                  <button
+                    type="button"
+                    className="pill-item review-trigger-pill"
+                    onClick={() => setReviewOrder({ cafeteriaId: cafeteria.id, cafeteriaName: cafeteria.name })}
+                    style={{
+                      background: "var(--mustard-tint)",
+                      border: "1px solid var(--mustard)",
+                      color: "var(--ink)",
+                      cursor: "pointer",
+                      padding: "4px 12px",
+                      borderRadius: 999,
+                      fontWeight: 600,
+                      fontSize: "0.82rem",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 6,
+                    }}
+                  >
+                    <Icon name="star" size={13} color="var(--mustard-dark)" />
+                    <span>Rate Cafeteria</span>
+                  </button>
                 </div>
               </div>
             </div>
@@ -424,7 +446,9 @@ export default function CafeteriaMenu() {
 
       <ReviewModal
         isOpen={Boolean(reviewOrder)}
-        order={reviewOrder}
+        order={reviewOrder?.items ? reviewOrder : null}
+        cafeteriaId={reviewOrder?.cafeteriaId || cafeteria?.id}
+        cafeteriaName={reviewOrder?.cafeteriaName || cafeteria?.name}
         onClose={() => setReviewOrder(null)}
       />
     </>

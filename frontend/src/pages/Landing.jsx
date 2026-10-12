@@ -8,6 +8,7 @@ import { InfoCardSkeleton, CafeteriaCardSkeleton } from "../components/Loader.js
 import { FEATURES, TESTIMONIALS, FAQS } from "../data/cafeterias.js";
 import Icon from "../components/Icons.jsx";
 import { useLiveCafeterias } from "../utils/liveCafeterias.js";
+import ReviewModal from "../components/ReviewModal.jsx";
 
 export default function Landing() {
   const { cafeterias, loading: liveLoading } = useLiveCafeterias(4000);
@@ -16,6 +17,20 @@ export default function Landing() {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterType, setFilterType] = useState("all"); // "all" | "open" | "fast"
   const [expandedFaq, setExpandedFaq] = useState(0);
+  const [reviewOpen, setReviewOpen] = useState(false);
+  const [reviewsRevision, setReviewsRevision] = useState(0);
+
+  const userReviews = useMemo(() => {
+    try {
+      return JSON.parse(localStorage.getItem("sbcms_user_reviews") || "[]");
+    } catch (e) {
+      return [];
+    }
+  }, [reviewsRevision]);
+
+  const allTestimonials = useMemo(() => {
+    return [...userReviews, ...TESTIMONIALS];
+  }, [userReviews]);
 
   useEffect(() => {
     const t1 = setTimeout(() => setInfoLoading(false), 300);
@@ -260,21 +275,40 @@ export default function Landing() {
       {/* Student & Faculty Testimonials */}
       <section className="section" style={{ background: "var(--teal-tint)" }}>
         <div className="container">
-          <div className="section-head">
-            <span className="section-eyebrow">
-              <Icon name="heart" size={14} />
-              <span>Campus Buzz</span>
-            </span>
-            <h2>Loved by Students & Faculty Across Campus</h2>
-            <p>Here is what the university community has to say about their dining experience.</p>
+          <div className="section-head" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: 16 }}>
+            <div>
+              <span className="section-eyebrow">
+                <Icon name="heart" size={14} />
+                <span>Campus Buzz</span>
+              </span>
+              <h2>Loved by Students & Faculty Across Campus</h2>
+              <p>Here is what the university community has to say about their dining experience.</p>
+            </div>
+
+            <button
+              type="button"
+              className="btn btn-mustard"
+              onClick={() => setReviewOpen(true)}
+              style={{ display: "inline-flex", alignItems: "center", gap: 8, whiteSpace: "nowrap" }}
+            >
+              <Icon name="star" size={16} />
+              <span>Drop a Review</span>
+            </button>
           </div>
 
           <div className="testimonials-grid">
-            {TESTIMONIALS.map((t) => (
+            {allTestimonials.map((t) => (
               <div key={t.id} className="card testimonial-card">
+                {t.rating && (
+                  <div style={{ display: "flex", gap: 3, marginBottom: 8 }}>
+                    {[...Array(t.rating)].map((_, i) => (
+                      <Icon key={i} name="star" size={14} color="var(--mustard-dark)" />
+                    ))}
+                  </div>
+                )}
                 <p className="testimonial-quote">"{t.quote}"</p>
                 <div className="testimonial-author">
-                  <div className="author-avatar">{t.avatar}</div>
+                  <div className="author-avatar">{t.avatar || (t.author ? t.author.charAt(0).toUpperCase() : "U")}</div>
                   <div>
                     <div className="author-name">{t.author}</div>
                     <div className="author-role">{t.role}</div>
@@ -390,6 +424,12 @@ export default function Landing() {
           </div>
         </div>
       </footer>
+
+      <ReviewModal
+        isOpen={reviewOpen}
+        onClose={() => setReviewOpen(false)}
+        onReviewSubmitted={() => setReviewsRevision((r) => r + 1)}
+      />
     </>
   );
 }

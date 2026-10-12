@@ -308,7 +308,7 @@ export default function OrderTrackingModal({ order, isOpen, onClose, onOpenRevie
             </button>
           )}
 
-          {order.orderStatus === "completed" && (
+          {(order.orderStatus === "completed" || order.orderStatus === "ready") && (
             <button
               type="button"
               className="btn btn-mustard btn-sm"

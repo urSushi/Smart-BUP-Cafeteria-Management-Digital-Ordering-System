@@ -10,6 +10,7 @@ import PaymentModal from "./PaymentModal.jsx";
 import OrderConfirmationModal from "./OrderConfirmationModal.jsx";
 import OrderTrackingModal from "./OrderTrackingModal.jsx";
 import AuthPromptModal from "./AuthPromptModal.jsx";
+import ReviewModal from "./ReviewModal.jsx";
 import ThemeToggle from "./ThemeToggle.jsx";
 
 export default function Navbar() {
@@ -23,6 +24,7 @@ export default function Navbar() {
   const [authPromptOpen, setAuthPromptOpen] = useState(false);
   const [confirmedOrder, setConfirmedOrder] = useState(null);
   const [trackingOrder, setTrackingOrder] = useState(null);
+  const [reviewModalOpen, setReviewModalOpen] = useState(false);
 
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
@@ -359,6 +361,18 @@ export default function Navbar() {
                       <span>My Active Orders & History</span>
                     </Link>
 
+                    <button
+                      type="button"
+                      className="dropdown-item"
+                      onClick={() => {
+                        setUserDropdown(false);
+                        setReviewModalOpen(true);
+                      }}
+                    >
+                      <Icon name="star" size={16} color="var(--mustard-dark)" />
+                      <span>Rate & Review Experience</span>
+                    </button>
+
                     {/* Operational Quick Portals */}
                     {role === "cafeteria_staff" && (
                       <Link to="/staff/dashboard" className="dropdown-item" onClick={() => setUserDropdown(false)}>
@@ -490,6 +504,26 @@ export default function Navbar() {
                   <span className="nav-badge-pill">{activeOrders.length}</span>
                 )}
               </Link>
+
+              <button
+                type="button"
+                className="mobile-nav-link"
+                style={{
+                  width: "100%",
+                  background: "none",
+                  border: "none",
+                  textAlign: "left",
+                  cursor: "pointer",
+                  fontFamily: "inherit",
+                }}
+                onClick={() => {
+                  setOpen(false);
+                  setReviewModalOpen(true);
+                }}
+              >
+                <span>Rate & Review Experience</span>
+                <Icon name="star" size={16} color="var(--mustard-dark)" />
+              </button>
 
               {role === "cafeteria_staff" && (
                 <Link
@@ -644,6 +678,11 @@ export default function Navbar() {
         isOpen={Boolean(trackingOrder)}
         order={trackingOrder}
         onClose={() => setTrackingOrder(null)}
+      />
+
+      <ReviewModal
+        isOpen={reviewModalOpen}
+        onClose={() => setReviewModalOpen(false)}
       />
     </>
   );

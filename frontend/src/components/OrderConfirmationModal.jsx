@@ -95,6 +95,14 @@ export default function OrderConfirmationModal({ order, isOpen, onClose, onTrack
             <span>Track Live Order</span>
           </button>
         </div>
+
+        {/* Feedback helper */}
+        <div style={{ textAlign: "center", marginTop: 14 }}>
+          <span style={{ fontSize: "0.8rem", color: "var(--ink-soft)" }}>
+            Picked up food? You can drop a review anytime from{" "}
+            <span style={{ fontWeight: 600, color: "var(--teal)" }}>My Orders</span> or the navigation menu.
+          </span>
+        </div>
       </div>
     </div>
   );

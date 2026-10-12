@@ -34,15 +34,26 @@ export default function Orders() {
             </p>
           </div>
 
-          <button
-            type="button"
-            className="btn btn-secondary btn-sm"
-            onClick={refreshOrders}
-            disabled={loading}
-          >
-            <Icon name="zap" size={14} />
-            <span>Refresh Status</span>
-          </button>
+          <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
+            <button
+              type="button"
+              className="btn btn-mustard btn-sm"
+              onClick={() => setReviewOrder({ isGeneral: true })}
+            >
+              <Icon name="star" size={14} />
+              <span>Drop a Review</span>
+            </button>
+
+            <button
+              type="button"
+              className="btn btn-secondary btn-sm"
+              onClick={refreshOrders}
+              disabled={loading}
+            >
+              <Icon name="zap" size={14} />
+              <span>Refresh Status</span>
+            </button>
+          </div>
         </div>
 
         {/* Tab Buttons */}
@@ -188,11 +199,12 @@ export default function Orders() {
                     </div>
 
                     <div style={{ display: "flex", gap: 8 }}>
-                      {isCompleted && (
+                      {(isCompleted || isReady) && (
                         <button
                           type="button"
                           className="btn btn-secondary btn-sm"
                           onClick={() => setReviewOrder(order)}
+                          title="Rate and review your meal"
                         >
                           <Icon name="star" size={13} color="var(--mustard-dark)" />
                           <span>Review</span>
@@ -226,7 +238,9 @@ export default function Orders() {
 
       <ReviewModal
         isOpen={Boolean(reviewOrder)}
-        order={reviewOrder}
+        order={reviewOrder?.items ? reviewOrder : null}
+        cafeteriaId={reviewOrder?.cafeteriaId}
+        cafeteriaName={reviewOrder?.cafeteriaName}
         onClose={() => setReviewOrder(null)}
       />
     </>

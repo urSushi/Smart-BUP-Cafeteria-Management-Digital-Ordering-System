@@ -633,6 +633,7 @@ select.input option[value=""] {
   align-items: center;
   gap: 12px;
   flex-shrink: 0;
+  min-width: max-content;
   cursor: pointer;
   user-select: none;
   text-decoration: none;
@@ -652,6 +653,8 @@ select.input option[value=""] {
   height: 38px;
   min-width: 38px;
   min-height: 38px;
+  max-width: 38px;
+  max-height: 38px;
   border-radius: 12px;
   background: linear-gradient(135deg, #0d9488 0%, #0f766e 50%, #d97706 100%);
   display: flex;
@@ -671,6 +674,7 @@ select.input option[value=""] {
   flex-direction: column;
   justify-content: center;
   flex-shrink: 0;
+  min-width: max-content;
   white-space: nowrap;
   line-height: 1;
 }
@@ -682,6 +686,8 @@ select.input option[value=""] {
   line-height: 1.15;
   letter-spacing: -0.025em;
   white-space: nowrap;
+  word-break: keep-all;
+  overflow-wrap: normal;
 }
 .brand-sub {
   font-size: 0.72rem;
@@ -690,6 +696,8 @@ select.input option[value=""] {
   text-transform: uppercase;
   letter-spacing: 0.05em;
   white-space: nowrap;
+  word-break: keep-all;
+  overflow-wrap: normal;
   margin-top: 1px;
 }
 

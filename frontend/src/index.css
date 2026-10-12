@@ -629,12 +629,14 @@ select.input option[value=""] {
   height: 70px;
 }
 .brand {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 12px;
+  flex-shrink: 0;
   cursor: pointer;
   user-select: none;
   text-decoration: none;
+  white-space: nowrap;
   transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1);
   will-change: transform;
 }
@@ -648,6 +650,8 @@ select.input option[value=""] {
 .brand-mark {
   width: 38px;
   height: 38px;
+  min-width: 38px;
+  min-height: 38px;
   border-radius: 12px;
   background: linear-gradient(135deg, #0d9488 0%, #0f766e 50%, #d97706 100%);
   display: flex;
@@ -656,6 +660,7 @@ select.input option[value=""] {
   color: #fff;
   box-shadow: 0 4px 14px rgba(15, 118, 110, 0.35);
   transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease;
+  flex-shrink: 0;
 }
 .brand-mark:hover {
   transform: translateY(-2px) scale(1.05);
@@ -664,14 +669,19 @@ select.input option[value=""] {
 .brand-text {
   display: flex;
   flex-direction: column;
+  justify-content: center;
+  flex-shrink: 0;
+  white-space: nowrap;
+  line-height: 1;
 }
 .brand-title {
   font-family: var(--font-display);
   font-weight: 750;
   font-size: 1.15rem;
   color: var(--ink);
-  line-height: 1.1;
+  line-height: 1.15;
   letter-spacing: -0.025em;
+  white-space: nowrap;
 }
 .brand-sub {
   font-size: 0.72rem;
@@ -679,6 +689,8 @@ select.input option[value=""] {
   color: var(--teal-dark);
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  white-space: nowrap;
+  margin-top: 1px;
 }
 
 .nav-links {
@@ -1034,10 +1046,23 @@ select.input option[value=""] {
 .mobile-nav-link.text-danger { color: var(--brick); }
 .mobile-nav-link.text-danger:hover { background: var(--brick-tint); }
 
-@media (max-width: 900px) {
+@media (max-width: 1040px) {
   .nav-links { display: none; }
   .nav-actions .btn { display: none; }
   .nav-hamburger { display: flex; }
+}
+
+@media (max-width: 1220px) and (min-width: 1041px) {
+  .nav-links { gap: 4px; }
+  .nav-links a,
+  .nav-links button,
+  .nav-links .nav-link-btn,
+  .nav-links .nav-link-item {
+    padding: 0 10px;
+    font-size: 0.88rem;
+  }
+  .nav-actions { gap: 6px; }
+  .nav-actions .btn { padding: 0 12px; font-size: 0.84rem; }
 }
 
 /* ==========================================================================

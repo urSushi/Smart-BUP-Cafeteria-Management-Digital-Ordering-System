@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "../components/Navbar.jsx";
 import { useOrders } from "../context/OrderContext.jsx";
@@ -13,6 +13,14 @@ export default function Orders() {
   const [activeTab, setActiveTab] = useState("active");
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [reviewOrder, setReviewOrder] = useState(null);
+
+  const reviewedOrders = useMemo(() => {
+    try {
+      return JSON.parse(localStorage.getItem("sbcms_reviewed_orders") || "[]");
+    } catch {
+      return [];
+    }
+  }, [reviewOrder]);
 
   const displayOrders = activeTab === "active" ? activeOrders : pastOrders;
 
@@ -207,7 +215,7 @@ export default function Orders() {
                           title="Rate and review your meal"
                         >
                           <Icon name="star" size={13} color="var(--mustard-dark)" />
-                          <span>Review</span>
+                          <span>{reviewedOrders.includes(order.id) ? "Reviewed ✓" : "Review"}</span>
                         </button>
                       )}
 

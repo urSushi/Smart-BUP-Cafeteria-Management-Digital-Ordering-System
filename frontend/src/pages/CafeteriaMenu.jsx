@@ -33,6 +33,7 @@ export default function CafeteriaMenu() {
   const [confirmOrder, setConfirmOrder] = useState(null);
   const [trackingOrder, setTrackingOrder] = useState(null);
   const [reviewOrder, setReviewOrder] = useState(null);
+  const [isReviewAutoPopup, setIsReviewAutoPopup] = useState(false);
 
   useEffect(() => {
     async function loadData() {
@@ -433,23 +434,50 @@ export default function CafeteriaMenu() {
       <OrderConfirmationModal
         isOpen={Boolean(confirmOrder)}
         order={confirmOrder}
-        onClose={() => setConfirmOrder(null)}
+        onClose={(skipAutoPopup) => {
+          const ord = confirmOrder;
+          setConfirmOrder(null);
+          if (!skipAutoPopup && ord && ord.id) {
+            try {
+              const dismissed = JSON.parse(localStorage.getItem("sbcms_dismissed_reviews") || "[]");
+              const reviewed = JSON.parse(localStorage.getItem("sbcms_reviewed_orders") || "[]");
+              if (!dismissed.includes(ord.id) && !reviewed.includes(ord.id)) {
+                // Show popup for review after ordering & payment done!
+                setIsReviewAutoPopup(true);
+                setReviewOrder(ord);
+              }
+            } catch {}
+          }
+        }}
         onTrackOrder={(order) => setTrackingOrder(order)}
+        onOpenReview={(order) => {
+          setConfirmOrder(null);
+          setIsReviewAutoPopup(true);
+          setReviewOrder(order);
+        }}
       />
 
       <OrderTrackingModal
         isOpen={Boolean(trackingOrder)}
         order={trackingOrder}
         onClose={() => setTrackingOrder(null)}
-        onOpenReview={(order) => setReviewOrder(order)}
+        onOpenReview={(order) => {
+          setTrackingOrder(null);
+          setIsReviewAutoPopup(false);
+          setReviewOrder(order);
+        }}
       />
 
       <ReviewModal
         isOpen={Boolean(reviewOrder)}
         order={reviewOrder?.items ? reviewOrder : null}
+        isAutoPopup={isReviewAutoPopup}
         cafeteriaId={reviewOrder?.cafeteriaId || cafeteria?.id}
         cafeteriaName={reviewOrder?.cafeteriaName || cafeteria?.name}
-        onClose={() => setReviewOrder(null)}
+        onClose={() => {
+          setReviewOrder(null);
+          setIsReviewAutoPopup(false);
+        }}
       />
     </>
   );

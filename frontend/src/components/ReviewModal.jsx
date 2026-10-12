@@ -20,6 +20,8 @@ export default function ReviewModal({
   isOpen,
   onClose,
   onReviewSubmitted,
+  onReviewLater,
+  isAutoPopup = false,
 }) {
   const { user } = useAuth();
   const toast = useToast();
@@ -67,6 +69,21 @@ export default function ReviewModal({
     : cafeteriaName ||
       CAFETERIA_OPTIONS.find((c) => c.id === selectedCafeteria)?.name ||
       "BUP Campus Dining";
+
+  function handleReviewLater() {
+    if (order?.id) {
+      try {
+        const dismissed = JSON.parse(localStorage.getItem("sbcms_dismissed_reviews") || "[]");
+        if (!dismissed.includes(order.id)) {
+          dismissed.push(order.id);
+          localStorage.setItem("sbcms_dismissed_reviews", JSON.stringify(dismissed));
+        }
+      } catch {}
+    }
+    toast.info("No problem! You can drop a review later anytime from My Orders or the navigation menu.");
+    onClose();
+    if (onReviewLater) onReviewLater();
+  }
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -116,6 +133,14 @@ export default function ReviewModal({
 
       const saved = JSON.parse(localStorage.getItem("sbcms_user_reviews") || "[]");
       localStorage.setItem("sbcms_user_reviews", JSON.stringify([userReview, ...saved]));
+
+      if (order?.id) {
+        const reviewed = JSON.parse(localStorage.getItem("sbcms_reviewed_orders") || "[]");
+        if (!reviewed.includes(order.id)) {
+          reviewed.push(order.id);
+          localStorage.setItem("sbcms_reviewed_orders", JSON.stringify(reviewed));
+        }
+      }
     } catch (localErr) {
       console.warn("Could not cache review locally:", localErr);
     }
@@ -127,15 +152,23 @@ export default function ReviewModal({
   }
 
   return (
-    <div className="modal-backdrop" onClick={onClose}>
+    <div className="modal-backdrop" onClick={handleReviewLater}>
       <div className="modal-card card review-modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <div>
             <span className="badge badge-open">
-              {isOrderSpecific ? "Order Experience Feedback" : "Campus Dining Review"}
+              {isAutoPopup
+                ? "Post-Order Dining Feedback"
+                : isOrderSpecific
+                ? "Order Experience Feedback"
+                : "Campus Dining Review"}
             </span>
             <h2 style={{ margin: "4px 0 2px", fontSize: "1.3rem" }}>
-              {isOrderSpecific ? "Rate Your Meal" : "Drop a Review"}
+              {isAutoPopup
+                ? "How was your experience?"
+                : isOrderSpecific
+                ? "Rate Your Meal"
+                : "Drop a Review"}
             </h2>
             <p style={{ margin: 0, fontSize: "0.82rem", color: "var(--ink-soft)" }}>
               {isOrderSpecific
@@ -143,7 +176,7 @@ export default function ReviewModal({
                 : "Share your rating and feedback to help improve university cafeterias"}
             </p>
           </div>
-          <button className="modal-close-btn" onClick={onClose} aria-label="Close">
+          <button className="modal-close-btn" onClick={handleReviewLater} aria-label="Close">
             <Icon name="x" size={18} />
           </button>
         </div>
@@ -254,14 +287,25 @@ export default function ReviewModal({
             />
           </div>
 
-          <button
-            type="submit"
-            className="btn btn-mustard btn-block btn-lg"
-            disabled={loading}
-            style={{ marginTop: 8 }}
-          >
-            {loading ? <Spinner dark /> : "Submit Rating & Review"}
-          </button>
+          <div style={{ display: "flex", gap: 10, marginTop: 14 }}>
+            <button
+              type="button"
+              className="btn btn-secondary"
+              style={{ flex: 1 }}
+              onClick={handleReviewLater}
+              disabled={loading}
+            >
+              Review Later
+            </button>
+            <button
+              type="submit"
+              className="btn btn-mustard"
+              style={{ flex: 2 }}
+              disabled={loading}
+            >
+              {loading ? <Spinner dark /> : "Drop Review"}
+            </button>
+          </div>
         </form>
       </div>
     </div>

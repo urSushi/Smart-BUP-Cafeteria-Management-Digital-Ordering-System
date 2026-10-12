@@ -2,11 +2,11 @@ import React from "react";
 import QRCodeDisplay from "./QRCodeDisplay.jsx";
 import Icon from "./Icons.jsx";
 
-export default function OrderConfirmationModal({ order, isOpen, onClose, onTrackOrder }) {
+export default function OrderConfirmationModal({ order, isOpen, onClose, onTrackOrder, onOpenReview }) {
   if (!isOpen || !order) return null;
 
   return (
-    <div className="modal-backdrop" onClick={onClose}>
+    <div className="modal-backdrop" onClick={() => onClose && onClose(false)}>
       <div className="modal-card card order-confirm-modal" onClick={(e) => e.stopPropagation()}>
         {/* Success Header */}
         <div className="order-confirm-header">
@@ -72,13 +72,81 @@ export default function OrderConfirmationModal({ order, isOpen, onClose, onTrack
           </div>
         </div>
 
+        {/* Post-Payment Review Prompt Card */}
+        <div
+          className="confirm-review-invite"
+          style={{
+            marginTop: 16,
+            padding: "12px 14px",
+            background: "var(--teal-tint)",
+            border: "1px dashed var(--teal)",
+            borderRadius: "var(--radius-md)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: 12,
+            flexWrap: "wrap",
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <div
+              style={{
+                width: 34,
+                height: 34,
+                borderRadius: "50%",
+                background: "var(--mustard-tint)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0,
+              }}
+            >
+              <Icon name="star" size={17} color="var(--mustard-dark)" />
+            </div>
+            <div>
+              <div style={{ fontWeight: 700, fontSize: "0.88rem", color: "var(--ink)" }}>
+                Drop a Quick Review?
+              </div>
+              <div style={{ fontSize: "0.78rem", color: "var(--ink-soft)" }}>
+                Rate your meal now or review later anytime.
+              </div>
+            </div>
+          </div>
+
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            <button
+              type="button"
+              className="btn btn-mustard btn-sm"
+              onClick={() => {
+                if (onOpenReview) {
+                  onClose(true);
+                  onOpenReview(order);
+                } else {
+                  onClose(false);
+                }
+              }}
+            >
+              <Icon name="star" size={13} />
+              <span>Drop Review</span>
+            </button>
+            <button
+              type="button"
+              className="btn btn-ghost btn-sm"
+              style={{ fontSize: "0.8rem", padding: "4px 8px" }}
+              onClick={() => onClose(true)}
+            >
+              Review Later
+            </button>
+          </div>
+        </div>
+
         {/* Buttons */}
-        <div style={{ display: "flex", gap: 10, marginTop: 18 }}>
+        <div style={{ display: "flex", gap: 10, marginTop: 14 }}>
           <button
             type="button"
             className="btn btn-secondary"
             style={{ flex: 1 }}
-            onClick={onClose}
+            onClick={() => onClose(false)}
           >
             Close
           </button>
@@ -87,21 +155,13 @@ export default function OrderConfirmationModal({ order, isOpen, onClose, onTrack
             className="btn btn-primary"
             style={{ flex: 2 }}
             onClick={() => {
-              onClose();
+              onClose(true);
               if (onTrackOrder) onTrackOrder(order);
             }}
           >
             <Icon name="zap" size={16} />
             <span>Track Live Order</span>
           </button>
-        </div>
-
-        {/* Feedback helper */}
-        <div style={{ textAlign: "center", marginTop: 14 }}>
-          <span style={{ fontSize: "0.8rem", color: "var(--ink-soft)" }}>
-            Picked up food? You can drop a review anytime from{" "}
-            <span style={{ fontWeight: 600, color: "var(--teal)" }}>My Orders</span> or the navigation menu.
-          </span>
         </div>
       </div>
     </div>

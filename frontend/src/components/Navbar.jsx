@@ -25,6 +25,8 @@ export default function Navbar() {
   const [confirmedOrder, setConfirmedOrder] = useState(null);
   const [trackingOrder, setTrackingOrder] = useState(null);
   const [reviewModalOpen, setReviewModalOpen] = useState(false);
+  const [reviewTargetOrder, setReviewTargetOrder] = useState(null);
+  const [isAutoReviewPopup, setIsAutoReviewPopup] = useState(false);
 
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
@@ -670,19 +672,52 @@ export default function Navbar() {
       <OrderConfirmationModal
         isOpen={Boolean(confirmedOrder)}
         order={confirmedOrder}
-        onClose={() => setConfirmedOrder(null)}
+        onClose={(skipAutoPopup) => {
+          const ord = confirmedOrder;
+          setConfirmedOrder(null);
+          if (!skipAutoPopup && ord && ord.id) {
+            try {
+              const dismissed = JSON.parse(localStorage.getItem("sbcms_dismissed_reviews") || "[]");
+              const reviewed = JSON.parse(localStorage.getItem("sbcms_reviewed_orders") || "[]");
+              if (!dismissed.includes(ord.id) && !reviewed.includes(ord.id)) {
+                // Show popup for review after ordering & payment done!
+                setReviewTargetOrder(ord);
+                setIsAutoReviewPopup(true);
+                setReviewModalOpen(true);
+              }
+            } catch {}
+          }
+        }}
         onTrackOrder={(ord) => setTrackingOrder(ord)}
+        onOpenReview={(ord) => {
+          setConfirmedOrder(null);
+          setReviewTargetOrder(ord);
+          setIsAutoReviewPopup(true);
+          setReviewModalOpen(true);
+        }}
       />
 
       <OrderTrackingModal
         isOpen={Boolean(trackingOrder)}
         order={trackingOrder}
         onClose={() => setTrackingOrder(null)}
+        onOpenReview={(ord) => {
+          setTrackingOrder(null);
+          setReviewTargetOrder(ord);
+          setIsAutoReviewPopup(false);
+          setReviewModalOpen(true);
+        }}
       />
 
       <ReviewModal
         isOpen={reviewModalOpen}
-        onClose={() => setReviewModalOpen(false)}
+        order={reviewTargetOrder}
+        isAutoPopup={isAutoReviewPopup}
+        onClose={() => {
+          setReviewModalOpen(false);
+          setReviewTargetOrder(null);
+          setIsAutoReviewPopup(false);
+        }}
       />
     </>
   );

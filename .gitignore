@@ -1,40 +1,40 @@
-# Dependency directories
+# Dependencies
 node_modules/
-*/node_modules/
 
-# Production build outputs
-dist/
-*/dist/
-build/
-*/build/
-
-# Local Environment Variables
+# Environment variables and secrets
 .env
-.env.local
-.env.*.local
-*.env
+.env.*
 !.env.example
+
+# Build output
+dist/
+build/
 
 # Logs
 logs/
 *.log
 npm-debug.log*
 yarn-debug.log*
-yarn-error.log*
 pnpm-debug.log*
-lerna-debug.log*
 
-# Editor & IDE configurations
-.vscode/
-.idea/
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
-.qodo/
+# Testing and coverage
+coverage/
 
-# OS metadata & temporary files
+# Cache
+.cache/
+.vite/
+.next/
+
+# Operating system files
 .DS_Store
 Thumbs.db
-*.zip
+Desktop.ini
+
+# IDE settings
+.vscode/*
+!.vscode/extensions.json
+.idea/
+
+# Temporary files
+*.tmp
+*.bak

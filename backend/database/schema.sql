@@ -164,7 +164,7 @@ CREATE TABLE orders (
     user_id VARCHAR(50) REFERENCES users(user_id) ON DELETE SET NULL,
     cafeteria_id VARCHAR(50) REFERENCES cafeterias(cafeteria_id) ON DELETE SET NULL,
     order_time TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    status VARCHAR(50) NOT NULL DEFAULT 'placed' CHECK (status IN ('placed', 'confirmed', 'preparing', 'ready', 'picked_up', 'cancelled')),
+    status VARCHAR(50) NOT NULL DEFAULT 'placed' CHECK (status IN ('placed', 'confirmed', 'preparing', 'ready', 'picked_up', 'completed', 'cancelled', 'refund_pending')),
     total_amount NUMERIC(10, 2) NOT NULL CHECK (total_amount >= 0),
     pickup_token VARCHAR(30),
     qr_code TEXT,
@@ -196,7 +196,7 @@ CREATE TABLE payments (
     method VARCHAR(50) NOT NULL CHECK (method IN ('bkash', 'nagad', 'upay', 'cash', 'card')),
     amount NUMERIC(10, 2) NOT NULL CHECK (amount >= 0),
     txn_ref VARCHAR(100),
-    status VARCHAR(50) NOT NULL DEFAULT 'completed' CHECK (status IN ('pending', 'completed', 'failed', 'refunded')),
+    status VARCHAR(50) NOT NULL DEFAULT 'completed' CHECK (status IN ('pending', 'completed', 'failed', 'refunded', 'paid', 'unpaid', 'refund_pending')),
     paid_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 

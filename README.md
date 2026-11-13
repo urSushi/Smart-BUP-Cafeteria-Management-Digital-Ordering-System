@@ -1,5 +1,5 @@
 <<<<<<< HEAD
-# 🍽️ Smart BUP Cafeteria Management & Digital Ordering System (SBCMS)
+#  Smart BUP Cafeteria Management & Digital Ordering System (SBCMS)
 
 [![React](https://img.shields.io/badge/React-18.3-61DAFB?logo=react&logoColor=black)](https://react.dev/)
 [![Vite](https://img.shields.io/badge/Vite-5.4-646CFF?logo=vite&logoColor=white)](https://vitejs.dev/)
@@ -16,7 +16,7 @@ The system solves peak lunch-rush congestion between university classes by integ
 
 ---
 
-## 📌 Project Overview & Description
+##  Project Overview & Description
 
 **Short Description:**
 > Smart campus dining automation and digital food ordering system for Bangladesh University of Professionals (BUP) — live queue wait-times, role-based KDS/manager consoles, OTP verification, and dual-theme UI.
@@ -26,9 +26,9 @@ In a busy university campus, students and faculty often face long dining counter
 
 ---
 
-## ✨ Key Features
+##  Key Features
 
-### 🎓 1. Campus Member Experience (Students, Faculty, Officers)
+###  1. Campus Member Experience (Students, Faculty, Officers)
 - **Live Cafeteria Directory**: Instant status overview of all 4 campus dining halls:
   - **Vista Cafeteria** (Central Dining Complex)
   - **Amitie Cafeteria** (Student Center, Level 2)
@@ -37,13 +37,13 @@ In a busy university campus, students and faculty often face long dining counter
 - **Real-Time Dining Telemetry**: Dynamic metrics displaying shortest kitchen queue, rush hour indicators, and open vs. paused kitchens.
 - **Interactive Food Catalog**: Filter meals by category (*Rice & Biryani, Snacks, Beverages, Bakery, Curries, Specials*), customize quantity, and view calorie counts & allergen tags.
 - **Multi-Gateway Payment Integration**:
-  - 📱 **bKash Mobile Banking** (Real-time simulated mobile wallet gateway)
-  - 📲 **Nagad Digital Payment**
-  - 💳 **BUP Student / Employee Smart Card** (Campus balance debit)
-  - 💵 **Pay on Counter** (Reserve token & pay cash upon tray collection)
+  -  **bKash Mobile Banking** (Real-time simulated mobile wallet gateway)
+  -  **Nagad Digital Payment**
+  -  **BUP Student / Employee Smart Card** (Campus balance debit)
+  -  **Pay on Counter** (Reserve token & pay cash upon tray collection)
 - **Digital Order Tracking & QR Verification**: Real-time order tracking (*Pending $\rightarrow$ Preparing $\rightarrow$ Ready for Pickup $\rightarrow$ Completed*) with a scannable verification QR code and printable pickup slip.
 
-### 🛡️ 2. Multi-Persona Authentication & RBAC
+###  2. Multi-Persona Authentication & RBAC
 - **Strict Role-Based Access Control**:
   - `student`: Standard campus ordering, order tracking, review submissions.
   - `faculty`: Academic dining privileges, faculty lounge access.
@@ -55,30 +55,30 @@ In a busy university campus, students and faculty often face long dining counter
 - **Dual-Factor Security**: 6-digit OTP verification powered by **Nodemailer SMTP** (with local dev console fallback).
 - **Fast Evaluation Role Switcher**: One-click demo account switcher in the navigation bar for evaluation and grading.
 
-### 👨‍🍳 3. Kitchen Display System (KDS — Staff Portal)
+###  3. Kitchen Display System (KDS — Staff Portal)
 - **Live Kitchen Order Kanban**: Real-time incoming orders stream directly to kitchen tablets/screens.
 - **One-Tap Order Stage Updates**: Move orders through *Preparing*, *Ready for Counter Call*, and *Handed Over*.
 - **Integrated QR Scanner**: Kitchen staff can scan student pickup QR codes using a built-in camera scanner modal to complete pickups in seconds.
 
-### 📊 4. Manager Dining Operations Console
+###  4. Manager Dining Operations Console
 - **Instant Emergency Controls**: Toggle entire cafeteria Open/Closed status with a single switch.
 - **Queue Wait-Time Telemetry Adjuster**: Adjust live queue estimates ($\le$5 min, 10 min, 20 min) reflected across the entire student website in real time.
 - **Live Inventory & Stock Manager**: Add, edit, or adjust food item stock counts; automated out-of-stock lockout prevents overselling.
 - **Daily Performance & Revenue Analytics**: Track orders completed, daily takings, and popular item trends.
 
-### 👑 5. System Administrator Console
+###  5. System Administrator Console
 - **Campus Canteen Auditing**: Global visibility over all four university cafeterias.
 - **Promotional Coupon Management**: Create percentage and flat-rate discount vouchers with usage limits and expiration dates.
 - **Refund & Dispute Audits**: Review customer cancellation requests and approve instant wallet refunds.
 
-### 🎨 6. Dual-Theme Design System
+###  6. Dual-Theme Design System
 - **Campus Paper Light Mode**: Warm, academic palette featuring BUP Teal (`#0f766e`), Warm Paper (`#fbf9f5`), and Golden Mustard accents.
 - **Executive Midnight Obsidian Dark Mode**: Deep slate background (`#090d16`), vibrant cyan-teal glow (`#2dd4bf`), high-contrast typography, and zero-flicker CSS transitions.
 - **Smooth Interaction Physics**: GPU-composited mechanical button press feedback (`scale(0.96) translateY(1px)`), smooth scroll spy, and slide-down mobile navigation panel.
 
 ---
 
-## 🏛️ System Architecture
+##  System Architecture
 
 ```mermaid
 flowchart TD
@@ -121,7 +121,7 @@ flowchart TD
 
 ---
 
-## 💻 Tech Stack
+##  Tech Stack
 
 | Domain | Technology | Description |
 |---|---|---|
@@ -137,7 +137,7 @@ flowchart TD
 
 ---
 
-## 🚀 Quick Start Guide
+##  Quick Start Guide
 
 ### Prerequisites
 - **Node.js** (v18.0.0 or higher recommended)
@@ -163,7 +163,7 @@ npm run dev
 ```
 *The backend API will run on **`http://localhost:5000`**.*
 
-> 💡 **Tip:** If you do not configure an SMTP email in `.env`, the server will automatically print all generated OTP codes directly to your terminal console for instant local testing!
+>  **Tip:** If you do not configure an SMTP email in `.env`, the server will automatically print all generated OTP codes directly to your terminal console for instant local testing!
 
 ### 3. Frontend Setup
 Open a new terminal window:
@@ -181,7 +181,7 @@ npm run dev
 
 ---
 
-## 🔑 Pre-Seeded Evaluation Accounts
+##  Pre-Seeded Evaluation Accounts
 
 To facilitate immediate testing and demonstration, the database comes pre-populated with active accounts across all user roles:
 
@@ -199,7 +199,7 @@ To facilitate immediate testing and demonstration, the database comes pre-popula
 
 ---
 
-## 📁 Repository Directory Structure
+##  Repository Directory Structure
 
 ```text
 sbcms-module1/
@@ -260,7 +260,7 @@ sbcms-module1/
 
 ---
 
-## 🛡️ License & Academic Context
+##  License & Academic Context
 
 This project is developed as part of academic coursework for **Software Reliability Engineering (SRE) Lab** at **Bangladesh University of Professionals (BUP)**, Mirpur Cantonment, Dhaka, Bangladesh.
 
